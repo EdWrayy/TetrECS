@@ -1,5 +1,9 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.beans.binding.Bindings;
+import javafx.scene.control.Label;
+import javafx.beans.property.IntegerProperty;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +20,13 @@ public class ChallengeScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
     protected Game game;
+
+    Label scoreLabel = new Label();
+    Label levelLabel = new Label();
+    Label multiplierLabel = new Label();
+    Label livesLabel = new Label();
+
+
 
     /**
      * Create a new Single Player challenge scene
@@ -63,12 +74,18 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Setup the game object and model
+     * Make sure the score, level, multiplier and lives labels are binded to the actual data.
      */
     public void setupGame() {
         logger.info("Starting a new challenge");
 
         //Start new game
         game = new Game(5, 5);
+        scoreLabel.textProperty().bind(game.getScoreProperty().asString());
+        levelLabel.textProperty().bind(game.getLevelProperty().asString());
+        multiplierLabel.textProperty().bind(game.getMultiplierProperty().asString());
+        livesLabel.textProperty().bind(game.getLivesProperty().asString());
+
     }
 
     /**
