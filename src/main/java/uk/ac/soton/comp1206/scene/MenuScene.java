@@ -14,6 +14,8 @@ import uk.ac.soton.comp1206.ui.GameWindow;
  */
 public class MenuScene extends BaseScene {
 
+    Multimedia multimedia;
+
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
 
     /**
@@ -69,7 +71,12 @@ public class MenuScene extends BaseScene {
      * @param event event
      */
     private void startGame(ActionEvent event) {
+
         gameWindow.startChallenge();
+        multimedia = new Multimedia();
+        String musicFilePath = "src/main/resources/music/menu.mp3";
+        multimedia.playBackgroundMusic(musicFilePath);
+
     }
 
 }
