@@ -1,10 +1,14 @@
 package uk.ac.soton.comp1206.game;
 
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
+import uk.ac.soton.comp1206.event.NextPieceListener;
+import uk.ac.soton.comp1206.scene.ChallengeScene;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +38,10 @@ public class Game {
      */
     protected final Grid grid;
 
-    GamePiece currentPiece;
+    private ObjectProperty<GamePiece> currentPiece = new SimpleObjectProperty<>();
+
+    private ObjectProperty<GamePiece> nextPiece = new SimpleObjectProperty<>();
+
 
 
     /**UI Properties*/
@@ -86,9 +93,20 @@ public class Game {
         this.multiplier.set(multiplier);
     }
 
+    public GamePiece getCurrentPiece(){
+        return currentPiece.get();
+    }
 
+    public GamePiece getNextPiece(){
+        return nextPiece.get();
+    }
 
-
+    public ObjectProperty<GamePiece> getCurrentPieceObjectProperty(){
+        return currentPiece;
+    }
+    public ObjectProperty<GamePiece> getNextPieceObjectProperty(){
+        return nextPiece;
+    }
 
 
     /**
@@ -103,7 +121,8 @@ public class Game {
 
         //Create a new grid model to represent the game state
         this.grid = new Grid(cols, rows);
-        currentPiece = spawnPiece();
+        currentPiece.set(spawnPiece());
+        nextPiece.set(spawnPiece());
     }
 
     /**
@@ -132,20 +151,23 @@ public class Game {
         int y = gameBlock.getY();
 
         //Get the new value for this block
+        /*
         int previousValue = grid.get(x, y);
         int newValue = previousValue + 1;
         if (newValue > GamePiece.PIECES) {
             newValue = 0;
         }
-
+        */
+        int blockValue = gameBlock.getValue();
         //Update the grid with the new value
-        grid.set(x, y, newValue);
+        //grid.set(x, y, blockValue);
 
-        if(grid.canPlayPiece(currentPiece, x, y)) {
-            grid.playPiece(currentPiece, x, y);
+        if(grid.canPlayPiece(getCurrentPiece(), x, y)) {
+            grid.playPiece(getCurrentPiece(), x, y);
+            afterPiece();
+            nextPiece(spawnPiece());
         }
-        nextPiece(spawnPiece());
-        afterPiece();
+
     }
 
     /**
@@ -176,7 +198,6 @@ public class Game {
     }
 
 
-    //Where my code begins
 
 
     /**Spawn piece method
@@ -193,15 +214,18 @@ public class Game {
     }
 
     /**nextPiece method
-     * @param nextPiece
+     * @param newPiece
      */
 
-    public void nextPiece(GamePiece nextPiece) {
-        logger.info("nextPiece method has been called with "+nextPiece);
-        this.currentPiece = nextPiece;
+    public void nextPiece(GamePiece newPiece) {
+        logger.info("nextPiece method has been called with "+newPiece);
+        this.currentPiece.set(getNextPiece());
+        this.nextPiece.set(newPiece);
     }
 
-    /**afterPiece method*/
+    /**afterPiece method
+     *
+     */
 
     public void afterPiece() {
         logger.info("afterPiece method has been called");
@@ -228,7 +252,6 @@ public class Game {
             }
             }
             if(columnIsFull){fullColumns.add(i);} //
-            numberOfLinesCleared++;
         }
 
 
@@ -242,12 +265,12 @@ public class Game {
                 }
             }
             if(rowIsFull){fullRows.add(j);}
-            numberOfLinesCleared++;
         }
 
-        /**Now clear the full columns if they are not already cleared and increment numberOfBlocksCleared*/
+        /**Now clear the full columns if they are not already cleared and increment numberOfBlocksCleared and numberOfLinesCleared*/
         Iterator<Integer> columnIterator = fullColumns.iterator();
         while(columnIterator.hasNext()){
+            numberOfLinesCleared++;
             int horizontalPosition = columnIterator.next();
             for(int j = 0; j < numberOfRows; j++){
                 if(grid.get(horizontalPosition,j) != 0) {
@@ -260,16 +283,18 @@ public class Game {
         /**Now clear the full rows if they are not already cleared and increment numberOfBlocksCleared*/
         Iterator<Integer> rowIterator = fullRows.iterator();
         while(rowIterator.hasNext()){
+            numberOfLinesCleared++;
             int verticalPosition = rowIterator.next();
             for(int i = 0; i < numberOfCols; i++){
-                if(grid.get(verticalPosition,i)!=0){
-                    grid.set(verticalPosition, i, 0);
+                if(grid.get(i, verticalPosition)!=0){
+                    grid.set(i,verticalPosition, 0);
                     numberOfBlocksCleared++;
                 }
             }
         }
         logger.info("afterPiece method has cleared "+numberOfLinesCleared+" lines and "+numberOfBlocksCleared+ " blocks.");
         score(numberOfLinesCleared, numberOfBlocksCleared);
+        /**Handle the increase in score*/
 
         if(numberOfLinesCleared >0){
             setMultiplier(getMultiplierValue()+1);
@@ -282,6 +307,8 @@ public class Game {
         double level = Math.floor((double) getScoreValue() /1000);
         int levelInt = (int)level;
         setLevel(levelInt);
+        /**Handle the change level*/
+
     }
 
 
@@ -290,4 +317,5 @@ public class Game {
         int scoreToAdd = numberOfLines * numberOfBlocks * 10 * getMultiplierValue();
         setScore(getScoreValue()+scoreToAdd);
     }
+
 }

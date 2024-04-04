@@ -89,10 +89,10 @@ public class GameBoard extends GridPane {
         this.width = width;
         this.height = height;
         this.grid = new Grid(cols,rows);
-
         //Build the GameBoard
         build();
     }
+
 
     /**
      * Get a specific block from the GameBoard, specified by it's row and column

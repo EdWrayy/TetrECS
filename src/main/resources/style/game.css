@@ -2,6 +2,10 @@
     -fx-background-color: black;
 }
 
+.gameboard{
+    -fx-background-color: transparent;
+}
+
 .intro {
     -fx-background-color: black;
 }
@@ -56,6 +60,8 @@
     -fx-border-color: black;
     -fx-stroke: black;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+    -fx-text-alignment: center;
+    -fx-alignment: center;
 }
 
 .heading {
@@ -66,27 +72,31 @@
     -fx-border-color: black;
     -fx-stroke: black;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+    -fx-text-alignment: center;
+    -fx-alignment: center;
 }
 
 .score {
     -fx-fill: yellow;
     -fx-font-family: 'Orbitron';
-    -fx-font-size: 36px;
+    -fx-font-size: 20px;
     -fx-font-weight: 700;
     -fx-border-color: black;
     -fx-stroke: black;
     -fx-text-alignment: center;
+    -fx-alignment: center;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
 }
 
 .level {
     -fx-fill: #ff6600;
     -fx-font-family: 'Orbitron';
-    -fx-font-size: 24px;
+    -fx-font-size: 20px;
     -fx-font-weight: 700;
     -fx-border-color: black;
     -fx-stroke: black;
     -fx-text-alignment: center;
+    -fx-alignment: center;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
 }
 
@@ -104,11 +114,12 @@
 .lives {
     -fx-fill: yellow;
     -fx-font-family: 'Orbitron';
-    -fx-font-size: 36px;
+    -fx-font-size: 20px;
     -fx-font-weight: 700;
     -fx-border-color: black;
     -fx-stroke: black;
     -fx-text-alignment: center;
+    -fx-alignment: center;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
 }
 
@@ -203,7 +214,9 @@ TextField {
 }
 
 .instructions {
-    -fx-font-size: 10px;
+    -fx-font-size: 15px;
     -fx-font-family: 'Orbitron';
-    -fx-fill: white;
+    -fx-fill: black;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
 }

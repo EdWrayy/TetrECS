@@ -1,15 +1,19 @@
 package uk.ac.soton.comp1206.scene;
 
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.beans.property.IntegerProperty;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
+import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.game.Game;
+import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 
@@ -25,6 +29,17 @@ public class ChallengeScene extends BaseScene {
     Label levelLabel = new Label();
     Label multiplierLabel = new Label();
     Label livesLabel = new Label();
+
+    Multimedia multimedia;
+
+
+    PieceBoard currentPieceDisplay = new PieceBoard();
+
+    PieceBoard nextPieceDisplay = new PieceBoard();
+
+    Label currentPieceLabel;
+
+    Label nextPieceLabel;
 
 
 
@@ -56,12 +71,69 @@ public class ChallengeScene extends BaseScene {
 
         var mainPane = new BorderPane();
         challengePane.getChildren().add(mainPane);
-
         var board = new GameBoard(game.getGrid(),gameWindow.getWidth()/2,gameWindow.getWidth()/2);
+        board.getStyleClass().add("gameboard");
         mainPane.setCenter(board);
 
         //Handle block on gameboard grid being clicked
         board.setOnBlockClick(this::blockClicked);
+
+        multimedia = new Multimedia();
+        String musicFilePath = "src/main/resources/music/game.wav";
+        multimedia.playBackgroundMusic(musicFilePath);
+
+        scoreLabel.textProperty().bind(Bindings.concat("Score:\n",game.getScoreProperty().asString()));
+        scoreLabel.setPrefSize(130, 70);
+        scoreLabel.getStyleClass().add("score");
+
+        levelLabel.textProperty().bind(Bindings.concat("Level:\n",game.getLevelProperty().asString()));
+        levelLabel.setPrefSize(130, 70);
+        levelLabel.getStyleClass().add("level");
+
+        multiplierLabel.textProperty().bind(Bindings.concat("Multiplier:\n",game.getMultiplierProperty().asString()));
+        multiplierLabel.setPrefSize(130, 70);
+        multiplierLabel.getStyleClass().add("score");
+
+        livesLabel.textProperty().bind(Bindings.concat("Lives:\n",game.getLivesProperty().asString()));
+        livesLabel.setPrefSize(130, 70);
+        livesLabel.getStyleClass().add("lives");
+
+        game.getCurrentPieceObjectProperty().addListener((obs, oldPiece, newPiece) -> updateCurrentPieceDisplay(newPiece));
+        game.getNextPieceObjectProperty().addListener((obs, oldPiece, newPiece) -> updateNextPieceDisplay(newPiece));
+
+
+
+        mainPane.setCenter(board);
+        HBox labels = new HBox();
+        labels.setPadding(new Insets(10, 10, 10, 10));
+        labels.setSpacing(10);
+
+        mainPane.setTop(labels);
+        labels.getChildren().add(scoreLabel);
+        labels.getChildren().add(levelLabel);
+        labels.getChildren().add(multiplierLabel);
+        labels.getChildren().add(livesLabel);
+
+        VBox pieceDisplays = new VBox();
+        pieceDisplays.setPadding(new Insets(10, 10, 10, 10));
+        pieceDisplays.setSpacing(10);
+        mainPane.setRight(pieceDisplays);
+
+        currentPieceDisplay = new PieceBoard();
+        nextPieceDisplay = new PieceBoard();
+
+        currentPieceLabel = new Label("Current Piece");
+        currentPieceLabel.getStyleClass().add("lives");
+        nextPieceLabel = new Label("Next Piece");
+        nextPieceLabel.getStyleClass().add("lives");
+
+        pieceDisplays.getChildren().add(currentPieceLabel);
+        pieceDisplays.getChildren().add(currentPieceDisplay);
+        pieceDisplays.getChildren().add(nextPieceLabel);
+        pieceDisplays.getChildren().add(nextPieceDisplay);
+
+
+
     }
 
     /**
@@ -75,17 +147,13 @@ public class ChallengeScene extends BaseScene {
     /**
      * Setup the game object and model
      * Make sure the score, level, multiplier and lives labels are binded to the actual data.
+     * Start playing the game music
      */
     public void setupGame() {
         logger.info("Starting a new challenge");
 
         //Start new game
         game = new Game(5, 5);
-        scoreLabel.textProperty().bind(game.getScoreProperty().asString());
-        levelLabel.textProperty().bind(game.getLevelProperty().asString());
-        multiplierLabel.textProperty().bind(game.getMultiplierProperty().asString());
-        livesLabel.textProperty().bind(game.getLivesProperty().asString());
-
     }
 
     /**
@@ -94,7 +162,32 @@ public class ChallengeScene extends BaseScene {
     @Override
     public void initialise() {
         logger.info("Initialising Challenge");
+        if (scene!=null){
+            scene.setOnKeyPressed(this::handleKeyPress);
+        }
         game.start();
+        updateCurrentPieceDisplay(game.getCurrentPiece());
+        updateNextPieceDisplay(game.getNextPiece());
     }
 
+    public void handleKeyPress(KeyEvent keyEvent){
+        switch(keyEvent.getCode()) {
+            case ESCAPE:
+                showMenu(keyEvent);
+                break;
+        }
+    }
+
+    private void showMenu(KeyEvent keyEvent){
+        gameWindow.startMenu();
+    }
+
+
+    private void updateCurrentPieceDisplay(GamePiece piece) {
+        currentPieceDisplay.displayPiece(piece);
+    }
+
+    private void updateNextPieceDisplay(GamePiece piece) {
+        nextPieceDisplay.displayPiece(piece);
+    }
 }

@@ -119,8 +119,8 @@ public class Grid {
         int[][] blockMakeUp = gamePiece.getBlocks();
         for (int i = 0; i < blockMakeUp.length; i++) { // Loop through each row
             for (int j = 0; j < blockMakeUp[i].length; j++) { // Loop through each column of the row
-                if ((blockMakeUp[i][j] == 1 && get(i+(xCoordinate-1), j+(yCoordinate-1)) > 0) ||
-                        (blockMakeUp[i][j] == 1 && get(i+(xCoordinate-1),j+(yCoordinate-1)) ==-1))
+                if ((blockMakeUp[i][j] > 0 && get(i+(xCoordinate-1), j+(yCoordinate-1)) > 0) ||
+                        (blockMakeUp[i][j] >0 && get(i+(xCoordinate-1),j+(yCoordinate-1)) ==-1))
                 {
                     canPlayPiece = false;
                 }
@@ -140,13 +140,14 @@ public class Grid {
      */
 
     public void playPiece(GamePiece gamePiece, int xCoordinate, int yCoordinate) {
-        logger.info("playPiece method was called on "+gamePiece);
+        logger.info("playPiece method was called on "+gamePiece+ " with centre X: "+xCoordinate+" Y: "+yCoordinate);
         int[][] blockMakeUp = gamePiece.getBlocks();
         int pieceValue = gamePiece.getValue();
         for (int i = 0; i < blockMakeUp.length; i++) { // Loop through each row
             for (int j = 0; j < blockMakeUp[i].length; j++) { // Loop through each column of the row
-                if (blockMakeUp[i][j] == 1) {
+                if (blockMakeUp[i][j] > 0) {
                     set(i+(xCoordinate-1), j+(yCoordinate-1), pieceValue);
+                    logger.info("playPiece method has placed a block at X: "+i+(xCoordinate-1) + " Y: "+j+(yCoordinate-1));
                 }
             }
         }
