@@ -42,7 +42,8 @@ public class Game {
 
     private ObjectProperty<GamePiece> nextPiece = new SimpleObjectProperty<>();
 
-
+    /**Temporary piece to set as a piece when swapping*/
+    GamePiece temporaryPiece;
 
     /**UI Properties*/
 
@@ -149,18 +150,8 @@ public class Game {
         //Get the position of this block
         int x = gameBlock.getX();
         int y = gameBlock.getY();
-
-        //Get the new value for this block
-        /*
-        int previousValue = grid.get(x, y);
-        int newValue = previousValue + 1;
-        if (newValue > GamePiece.PIECES) {
-            newValue = 0;
-        }
-        */
         int blockValue = gameBlock.getValue();
-        //Update the grid with the new value
-        //grid.set(x, y, blockValue);
+
 
         if(grid.canPlayPiece(getCurrentPiece(), x, y)) {
             grid.playPiece(getCurrentPiece(), x, y);
@@ -169,6 +160,8 @@ public class Game {
         }
 
     }
+
+
 
     /**
      * Get the grid model inside this game representing the game state of the board
@@ -318,4 +311,17 @@ public class Game {
         setScore(getScoreValue()+scoreToAdd);
     }
 
+    public void rotateCurrentPieceRight(){
+        getCurrentPiece().rotate(1);
+    }
+
+    public void rotateCurrentPieceLeft(){
+        getCurrentPiece().rotate(3);
+    }
+
+    public void swapPieces(){
+        this.temporaryPiece = getCurrentPiece();
+        this.currentPiece.set(getNextPiece());
+        this.nextPiece.set(temporaryPiece);
+    }
 }

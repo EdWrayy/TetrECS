@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.beans.property.IntegerProperty;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,6 +77,7 @@ public class ChallengeScene extends BaseScene {
         mainPane.setCenter(board);
 
         //Handle block on gameboard grid being clicked
+
         board.setOnBlockClick(this::blockClicked);
 
         multimedia = new Multimedia();
@@ -144,6 +146,11 @@ public class ChallengeScene extends BaseScene {
         game.blockClicked(gameBlock);
     }
 
+
+
+
+
+
     /**
      * Setup the game object and model
      * Make sure the score, level, multiplier and lives labels are binded to the actual data.
@@ -175,8 +182,24 @@ public class ChallengeScene extends BaseScene {
             case ESCAPE:
                 showMenu(keyEvent);
                 break;
+
+            case E:
+                logger.info("Rotating current piece right");
+                game.rotateCurrentPieceRight();
+                updateCurrentPieceDisplay(game.getCurrentPiece());
+                break;
+            case Q:
+                logger.info("Rotating current piece left");
+                game.rotateCurrentPieceLeft();
+                updateCurrentPieceDisplay(game.getCurrentPiece());
+                break;
+            case SPACE:
+                game.swapPieces();
+
         }
     }
+
+    private void handleMouseClick(){}
 
     private void showMenu(KeyEvent keyEvent){
         gameWindow.startMenu();
@@ -190,4 +213,8 @@ public class ChallengeScene extends BaseScene {
     private void updateNextPieceDisplay(GamePiece piece) {
         nextPieceDisplay.displayPiece(piece);
     }
+
+
+
+
 }

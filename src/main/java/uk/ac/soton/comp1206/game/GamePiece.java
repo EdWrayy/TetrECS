@@ -1,5 +1,11 @@
 package uk.ac.soton.comp1206.game;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import uk.ac.soton.comp1206.component.GameBlock;
+
+
+
 /**
  * Instances of GamePiece Represents the model of a specific Game Piece with it's block makeup.
  *
@@ -27,6 +33,8 @@ public class GamePiece {
      * The name of this piece
      */
     private final String name;
+
+    private static final Logger logger = LogManager.getLogger(GamePiece.class);
 
     /**
      * Create a new GamePiece of the specified piece number
@@ -208,6 +216,7 @@ public class GamePiece {
         rotated[0][2] = blocks[2][2];
 
         blocks = rotated;
+        logger.info("One rotation completed");
     }
 
 
