@@ -5,7 +5,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uk.ac.soton.comp1206.event.BlockClearedListener;
 import uk.ac.soton.comp1206.event.BlockClickedListener;
+import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.Grid;
 
 /**
@@ -18,7 +20,7 @@ import uk.ac.soton.comp1206.game.Grid;
  * The GameBoard is only a visual representation and should not contain game logic or model logic in it, which should
  * take place in the Grid.
  */
-public class GameBoard extends GridPane {
+public class GameBoard extends GridPane{
 
     private static final Logger logger = LogManager.getLogger(GameBoard.class);
 
@@ -56,6 +58,8 @@ public class GameBoard extends GridPane {
      * The listener to call when a specific block is clicked
      */
     private BlockClickedListener blockClickedListener;
+
+    Game game;
 
 
 
@@ -149,10 +153,16 @@ public class GameBoard extends GridPane {
         block.bind(grid.getGridProperty(x,y));
 
         //Add a mouse click handler to the block to trigger GameBoard blockClicked method
-        block.setOnMouseClicked((e) -> blockClicked(e, block));
+        block.setOnMouseClicked(e -> blockClicked(e, block));
+        block.setOnMouseEntered(e->block.setHovering());
+        block.setOnMouseExited(e->block.paint());
 
         return block;
     }
+
+
+
+
 
     /**
      * Set the listener to handle an event when a block is clicked
@@ -169,15 +179,12 @@ public class GameBoard extends GridPane {
      */
     private void blockClicked(MouseEvent event, GameBlock block) {
         logger.info("Block clicked: {}", block);
+        blockClickedListener.blockClicked(block,event);
+    }
 
-        if (blockClickedListener != null) {
-            if (event.getButton() == MouseButton.SECONDARY) {
-                blockClickedListener.blockClicked(block);
-            }
-            if (event.getButton() == MouseButton.PRIMARY) {
-                blockClickedListener.blockClicked(block);
-            }
-        }
+    public void clearBlock(int x, int y){
+        GameBlock gameBlock = getBlock(x,y);
+        gameBlock.fadeOutAnimation();
     }
 
 }

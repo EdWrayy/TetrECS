@@ -1,12 +1,20 @@
 package uk.ac.soton.comp1206.component;
 
+import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
+import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.*;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * The Visual User Interface component representing a single block in the grid.
@@ -45,6 +53,7 @@ public class GameBlock extends Canvas {
 
     private final GameBoard gameBoard;
 
+
     private final double width;
     private final double height;
 
@@ -78,6 +87,7 @@ public class GameBlock extends Canvas {
         this.x = x;
         this.y = y;
 
+
         //A canvas needs a fixed width and height
         setWidth(width);
         setHeight(height);
@@ -98,6 +108,93 @@ public class GameBlock extends Canvas {
     private void updateValue(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         paint();
     }
+
+
+    public void setHovering(){
+        Color color = COLOURS[getValue()];
+        double red = color.getRed();
+        double blue = color.getBlue();
+        double green = color.getGreen();
+        double opacity = color.getOpacity();
+
+
+        var gc = getGraphicsContext2D();
+        //Clear
+        gc.clearRect(0,0,width,height);
+
+        gc.beginPath();
+        gc.moveTo(0, 0); // Top left corner
+        gc.lineTo(width, 0); // Top right corner
+        gc.lineTo(0, height); // Bottom left corner
+        gc.closePath();
+        gc.setFill(new Color(red,blue,green,opacity/2));
+        gc.fill();
+
+        gc.beginPath();
+        gc.moveTo(width, height); // Bottom right corner
+        gc.lineTo(width, 0); // Top right corner
+        gc.lineTo(0, height); // Bottom left corner
+        gc.closePath();
+        gc.setFill(new Color(red,blue,green,opacity*0.9/2));
+        gc.fill();
+
+
+        //Border
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(0,0,width,height);
+    }
+
+
+
+
+
+    public void fadeOutAnimation(){
+        GraphicsContext gc = getGraphicsContext2D();
+        gc.setFill(new Color(1, 1, 1, 1));
+        gc.fillRect(0, 0, width, height);
+        gc.setStroke(new Color(1, 1, 1, 1));
+        gc.strokeRect(0,0,width,height);
+        //Draw a new square on top of the current block
+
+        new AnimationTimer() {
+            private long lastUpdate = 0;
+            private double opacity = 1.0; // Start with full opacity
+
+            @Override
+            public void handle(long now) {
+                if (lastUpdate == 0) {
+                    lastUpdate = now;
+                    return;
+                }
+
+                // Calculate elapsed time since last frame in seconds
+                double elapsedTime = (now - lastUpdate) / 1_000_000_000.0;
+                lastUpdate = now;
+
+                // Update opacity
+                opacity -= elapsedTime * 0.9; // Decrease opacity at a rate of 0.5 per second
+                if (opacity < 0) {
+                    opacity = 0;
+                    this.stop(); // Stop the animation when fully transparent
+                    paintEmpty();
+                    return;
+                }
+
+                // Clear the area and redraw the shape with new opacity
+                gc.clearRect(0, 0, width, height); // Clear the area to avoid ghosting
+                gc.setFill(new Color(1, 1, 1, opacity));
+                gc.fillRect(0, 0, width, height);
+                gc.setStroke(new Color(1, 1, 1, opacity));
+                gc.strokeRect(0, 0, width, height);
+            }
+        }.start();
+        gc.clearRect(0,0,width,height);
+    }
+
+
+
+
+
 
     /**
      * Handle painting of the block canvas
@@ -122,7 +219,7 @@ public class GameBlock extends Canvas {
         gc.clearRect(0,0,width,height);
 
         //Fill
-        gc.setFill(Color.WHITE);
+        gc.setFill(new Color(1.0, 1.0, 1.0, 0.1));
         gc.fillRect(0,0, width, height);
 
         //Border
@@ -140,13 +237,43 @@ public class GameBlock extends Canvas {
         //Clear
         gc.clearRect(0,0,width,height);
 
-        //Colour fill
-        gc.setFill(colour);
-        gc.fillRect(0,0, width, height);
+        Color color = (Color) colour;
+        double red = color.getRed();
+        double blue = color.getBlue();
+        double green = color.getGreen();
+        double opacity = color.getOpacity();
+
+        gc.beginPath();
+        gc.moveTo(0, 0); // Top left corner
+        gc.lineTo(width, 0); // Top right corner
+        gc.lineTo(0, height); // Bottom left corner
+        gc.closePath();
+        gc.setFill(new Color(red,blue,green,opacity));
+        gc.fill();
+
+
+        gc.beginPath();
+        gc.moveTo(width, height); // Bottom right corner
+        gc.lineTo(width, 0); // Top right corner
+        gc.lineTo(0, height); // Bottom left corner
+        gc.closePath();
+        gc.setFill(new Color(red,blue,green,opacity*0.9));
+        gc.fill();
+
 
         //Border
         gc.setStroke(Color.BLACK);
         gc.strokeRect(0,0,width,height);
+    }
+
+
+    public void addCenterRing(){
+        var gc = getGraphicsContext2D();
+        double diameter = Math.min(width, height) * 0.6;
+        double centerX = (width - diameter) / 2;
+        double centerY = (height - diameter) / 2;
+        gc.setFill(new Color(0.5, 0.5, 0.5, 0.5));
+        gc.fillOval(centerX, centerY, diameter, diameter);
     }
 
     /**

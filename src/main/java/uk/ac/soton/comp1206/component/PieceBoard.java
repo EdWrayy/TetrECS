@@ -19,8 +19,8 @@ public class PieceBoard extends GameBoard {
         super(3,3,100,100);
         cols = 3;
         rows = 3;
-        width = 100;
-        height = 100;
+        width = 80;
+        height = 80;
         this.grid = new Grid(cols,rows);
         build();
     }
@@ -50,6 +50,7 @@ public class PieceBoard extends GameBoard {
                 }
             }
         }
+        getBlock(1,1).addCenterRing();
         logger.info("Piece displayed");
         return this;
     }

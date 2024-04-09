@@ -1,5 +1,6 @@
 package uk.ac.soton.comp1206.event;
 
+import javafx.scene.input.MouseEvent;
 import uk.ac.soton.comp1206.component.GameBlock;
 
 /**
@@ -12,7 +13,7 @@ public interface BlockClickedListener {
      * Handle a block clicked event
      * @param block the block that was clicked
      */
-    public void blockClicked(GameBlock block);
+    public void blockClicked(GameBlock block, MouseEvent event);
 
 
 }

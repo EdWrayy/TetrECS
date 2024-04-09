@@ -4,15 +4,16 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.ActionEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
+import uk.ac.soton.comp1206.event.BlockClearedListener;
+import uk.ac.soton.comp1206.event.FailToPlaceListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
 import uk.ac.soton.comp1206.scene.ChallengeScene;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 /**
  * The Game class handles the main logic, state and properties of the TetrECS game. Methods to manipulate the game state
@@ -28,6 +29,8 @@ public class Game {
      */
     protected final int rows;
 
+    BlockClearedListener blockClearedListener;
+
     /**
      * Number of columns
      */
@@ -37,6 +40,8 @@ public class Game {
      * The grid model linked to the game
      */
     protected final Grid grid;
+
+    private FailToPlaceListener failToPlaceListener;
 
     private ObjectProperty<GamePiece> currentPiece = new SimpleObjectProperty<>();
 
@@ -126,6 +131,14 @@ public class Game {
         nextPiece.set(spawnPiece());
     }
 
+    public void setFailToPlaceListener(FailToPlaceListener failToPlaceListener){
+        this.failToPlaceListener = failToPlaceListener;
+    }
+
+    public void setBlockClearedListener(BlockClearedListener blockClearedListener){
+        this.blockClearedListener = blockClearedListener;
+    }
+
     /**
      * Start the game
      */
@@ -157,7 +170,9 @@ public class Game {
             grid.playPiece(getCurrentPiece(), x, y);
             afterPiece();
             nextPiece(spawnPiece());
+            failToPlaceListener.failedToPlace(false);
         }
+        else{failToPlaceListener.failedToPlace(true);}
 
     }
 
@@ -267,11 +282,14 @@ public class Game {
             int horizontalPosition = columnIterator.next();
             for(int j = 0; j < numberOfRows; j++){
                 if(grid.get(horizontalPosition,j) != 0) {
+                    blockClearedListener.blockCleared(horizontalPosition,j);
                     grid.set(horizontalPosition, j, 0);
                     numberOfBlocksCleared++;
                 }
             }
         }
+
+
 
         /**Now clear the full rows if they are not already cleared and increment numberOfBlocksCleared*/
         Iterator<Integer> rowIterator = fullRows.iterator();
@@ -280,6 +298,7 @@ public class Game {
             int verticalPosition = rowIterator.next();
             for(int i = 0; i < numberOfCols; i++){
                 if(grid.get(i, verticalPosition)!=0){
+                    blockClearedListener.blockCleared(i, verticalPosition);
                     grid.set(i,verticalPosition, 0);
                     numberOfBlocksCleared++;
                 }

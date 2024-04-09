@@ -2,8 +2,12 @@ package uk.ac.soton.comp1206.scene;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.effect.ImageInput;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -15,6 +19,8 @@ import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+
+import java.net.URL;
 
 public class InstructionsScene extends BaseScene{
 
@@ -54,16 +60,23 @@ public class InstructionsScene extends BaseScene{
         VBox instructions = new VBox();
         instructions.setSpacing(10);
         instructions.setPadding(new Insets(10,10,10,10));
+        instructions.setAlignment(Pos.CENTER);
         mainPane.setTop(instructions);
 
         Label title = new Label("How to Play");
         title.getStyleClass().add("title");
-        Label description = new Label("TetrECS is a fast paced block game where you attempt to fit pieces into the grid in order to fill in rows and columns.\n" +
-                "When a row and column is full it will clear and increase the score. Consecutively clearing rows or columns will increase the multiplier.\n"+
-                "Fail to place a block in time and you will lose a life, lose 3 lives and the game is over!" );
+        Label description = new Label("TetrECS is a fast paced gravity free block game where you must fit pieces \n into the grid before the timer runs out. If unsuccessful you will \n lose a life, lose 3 lives and you are out!" );
         description.getStyleClass().add("instructions");
-        Label piecesLabel = new Label("These are the 15 different possible pieces:");
+        Label piecesLabel = new Label("Game Pieces");
         piecesLabel.getStyleClass().add("heading");
+        URL imageUrl = getClass().getResource("/images/Instructions.png");
+        Image instructionsImage = new Image(imageUrl.toString());
+        ImageView instructionsImageView = new ImageView(instructionsImage);
+        instructionsImageView.setFitHeight(400);
+        instructionsImageView.setFitWidth(800);
+        instructionsImageView.setPreserveRatio(true);
+
+
 
 
         GridPane piecesGrid = new GridPane();
@@ -71,10 +84,13 @@ public class InstructionsScene extends BaseScene{
         piecesGrid.setVgap(5);
         piecesGrid.setHgap(5);
 
+
         instructions.getChildren().add(title);
         instructions.getChildren().add(description);
+        instructions.getChildren().add(instructionsImageView);
         instructions.getChildren().add(piecesLabel);
         instructions.getChildren().add(piecesGrid);
+
 
 
         /**Adding the different pieces to the gridpane*/
@@ -142,6 +158,7 @@ public class InstructionsScene extends BaseScene{
 
 
     }
+
 
 
 

@@ -43,4 +43,5 @@ public class Multimedia {
         musicPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Loops
         musicPlayer.play();
     }
+
 }

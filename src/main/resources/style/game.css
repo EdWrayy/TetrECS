@@ -216,7 +216,8 @@ TextField {
 .instructions {
     -fx-font-size: 15px;
     -fx-font-family: 'Orbitron';
-    -fx-fill: black;
+    -fx-color: white;
+    -fx-fill: white;
     -fx-text-alignment: center;
     -fx-alignment: center;
 }

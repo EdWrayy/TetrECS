@@ -73,6 +73,8 @@ public class MenuScene extends BaseScene {
         buttonLayout.getChildren().addAll(playButton, instructionsButton);
     }
 
+
+
     /**
      * Initialise the menu
      */
