@@ -21,9 +21,9 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 /**
  * The Single Player challenge scene. Holds the UI for the single player challenge mode in the game.
  */
-public class ChallengeScene extends BaseScene implements FailToPlaceListener, BlockClearedListener {
+public class ChallengeScene extends BaseScene{
 
-    @Override
+
     public void failedToPlace(boolean failedToPlace) {
         if (failedToPlace) {
             multimedia.playAudio("src/main/resources/sounds/fail.wav");
@@ -90,8 +90,8 @@ public class ChallengeScene extends BaseScene implements FailToPlaceListener, Bl
         mainPane.setCenter(board);
 
         //Handle block on gameboard grid being clicked
-        game.setFailToPlaceListener(this);
-        game.setBlockClearedListener(this);
+        game.setFailToPlaceListener(this::failedToPlace);
+        game.setBlockClearedListener(this::blockCleared);
         board.setOnBlockClick(this::blockClicked);
 
 
@@ -290,7 +290,7 @@ public class ChallengeScene extends BaseScene implements FailToPlaceListener, Bl
     }
 
 
-    @Override
+
     public void blockCleared(int x, int y) {
         GameBlock fadeBlock  = board.getBlock(x,y);
         board.clearBlock(x, y);
