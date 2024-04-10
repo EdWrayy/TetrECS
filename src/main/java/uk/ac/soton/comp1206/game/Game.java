@@ -1,19 +1,22 @@
 package uk.ac.soton.comp1206.game;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.application.Platform;
+import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.event.BlockClearedListener;
 import uk.ac.soton.comp1206.event.FailToPlaceListener;
+import uk.ac.soton.comp1206.event.GameLoopListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
 import uk.ac.soton.comp1206.scene.ChallengeScene;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The Game class handles the main logic, state and properties of the TetrECS game. Methods to manipulate the game state
@@ -43,6 +46,8 @@ public class Game {
 
     private FailToPlaceListener failToPlaceListener;
 
+    private GameLoopListener gameLoopListener;
+
     private ObjectProperty<GamePiece> currentPiece = new SimpleObjectProperty<>();
 
     private ObjectProperty<GamePiece> nextPiece = new SimpleObjectProperty<>();
@@ -50,12 +55,20 @@ public class Game {
     /**Temporary piece to set as a piece when swapping*/
     GamePiece temporaryPiece;
 
+    private int timerDelay;
+
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> gameLoopHandle = null;
+    private ScheduledFuture<?> progressFuture;
+
     /**UI Properties*/
 
     private IntegerProperty score = new SimpleIntegerProperty(this, "score", 0);
     private IntegerProperty level = new SimpleIntegerProperty(this, "level", 0 );
     private IntegerProperty lives = new SimpleIntegerProperty(this, "lives", 3);
     private IntegerProperty multiplier = new SimpleIntegerProperty(this, "multiplier", 1);
+
+
 
     public IntegerProperty getScoreProperty(){
         return score;
@@ -99,6 +112,10 @@ public class Game {
         this.multiplier.set(multiplier);
     }
 
+
+
+
+
     public GamePiece getCurrentPiece(){
         return currentPiece.get();
     }
@@ -115,6 +132,9 @@ public class Game {
     }
 
 
+
+
+
     /**
      * Create a new game with the specified rows and columns. Creates a corresponding grid model.
      *
@@ -124,6 +144,8 @@ public class Game {
     public Game(int cols, int rows) {
         this.cols = cols;
         this.rows = rows;
+        this.timerDelay = 12000;
+
 
         //Create a new grid model to represent the game state
         this.grid = new Grid(cols, rows);
@@ -139,6 +161,10 @@ public class Game {
         this.blockClearedListener = blockClearedListener;
     }
 
+    public void setGameLoopListener(GameLoopListener gameLoopListener){
+        this.gameLoopListener = gameLoopListener;
+    }
+
     /**
      * Start the game
      */
@@ -147,12 +173,95 @@ public class Game {
         initialiseGame();
     }
 
+
+
+
+
+
+
     /**
      * Initialise a new game and set up anything that needs to be done at the start
      */
     public void initialiseGame() {
         logger.info("Initialising game");
+        final Runnable gameLoop = new Runnable()
+        {
+            public void run() {
+                gameLoop();
+                logger.info("Gameloop has been called");
+            }
+        };
+        long initialDelay = 12000;
+        long interval = getTimerDelay(); // The period between successive executions
+        gameLoopHandle = scheduler.scheduleAtFixedRate(gameLoop, initialDelay, interval, TimeUnit.MILLISECONDS);
+        startProgressUpdater();
     }
+
+
+
+    public void gameLoop(){
+        Platform.runLater(() -> {
+            setLives(getLivesValue() - 1);
+            setMultiplier(1);
+            currentPiece.set(spawnPiece());
+            logger.info("Time ran out, gameloop method has been called");
+            startProgressUpdater();
+            checkLives();
+        });
+    }
+
+    private void startProgressUpdater() {
+        final long startTime = System.currentTimeMillis();
+        progressFuture = scheduler.scheduleAtFixedRate(() -> {
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            double progress = Math.max(0.0, (getTimerDelay() - elapsedTime) / (double) getTimerDelay());
+            if (gameLoopListener != null) {
+                gameLoopListener.progress(progress);
+            }
+            // Automatically stop the progress updater when time runs out
+            if (progress <= 0.0) {
+                if (progressFuture != null && !progressFuture.isCancelled()) {
+                    progressFuture.cancel(false);
+                }
+            }
+        }, 0, 100, TimeUnit.MILLISECONDS); // Update every 100 milliseconds
+    }
+
+
+
+    private void checkLives(){
+        if(getLivesValue()<0){
+            stopLoop();
+            //End game
+        }
+    }
+
+    public void stopLoop() {
+        scheduler.shutdown(); // Shut down the scheduler
+        try {
+            if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow(); // Force shutdown if not terminated
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+        }
+        logger.info("Game loop has been stopped");
+    }
+
+    private void resetTimer(){
+        gameLoopHandle.cancel(true);
+        // Schedule a new game loop task with the updated delay
+        gameLoopHandle = scheduler.scheduleAtFixedRate(this::gameLoop, 12000, getTimerDelay(), TimeUnit.MILLISECONDS);
+        if (progressFuture != null && !progressFuture.isCancelled()) {
+            progressFuture.cancel(false);
+            startProgressUpdater();
+        }
+    }
+
+
+
+
+
 
     /**
      * Handle what should happen when a particular block is clicked
@@ -171,6 +280,7 @@ public class Game {
             afterPiece();
             nextPiece(spawnPiece());
             failToPlaceListener.failedToPlace(false);
+            resetTimer();
         }
         else{failToPlaceListener.failedToPlace(true);}
 
@@ -343,4 +453,19 @@ public class Game {
         this.currentPiece.set(getNextPiece());
         this.nextPiece.set(temporaryPiece);
     }
+
+
+    public int getTimerDelay(){
+        int newTimerDelay = 12000-(500*this.getLevelValue());
+        if(newTimerDelay<=2500){
+            this.timerDelay=2500;
+            return this.timerDelay;
+        }
+        else{
+            this.timerDelay = newTimerDelay;
+            return this.timerDelay;
+        }
+    }
+
+
 }

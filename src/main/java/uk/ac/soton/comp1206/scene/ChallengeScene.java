@@ -1,8 +1,10 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -32,6 +34,11 @@ public class ChallengeScene extends BaseScene{
         }
     }
 
+    public void timerBar(double progress){
+        Platform.runLater(() -> timerBar.setProgress(progress));
+        logger.info("The timer bar is currently at "+progress);
+    }
+
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
     protected Game game;
@@ -40,6 +47,8 @@ public class ChallengeScene extends BaseScene{
     Label levelLabel = new Label();
     Label multiplierLabel = new Label();
     Label livesLabel = new Label();
+
+    ProgressBar timerBar;
 
     Multimedia multimedia;
 
@@ -92,6 +101,7 @@ public class ChallengeScene extends BaseScene{
         //Handle block on gameboard grid being clicked
         game.setFailToPlaceListener(this::failedToPlace);
         game.setBlockClearedListener(this::blockCleared);
+        game.setGameLoopListener(this::timerBar);
         board.setOnBlockClick(this::blockClicked);
 
 
@@ -114,6 +124,9 @@ public class ChallengeScene extends BaseScene{
         livesLabel.textProperty().bind(Bindings.concat("Lives:\n", game.getLivesProperty().asString()));
         livesLabel.setPrefSize(130, 70);
         livesLabel.getStyleClass().add("lives");
+
+        timerBar = new ProgressBar();
+
 
         game.getCurrentPieceObjectProperty().addListener((obs, oldPiece, newPiece) -> updateCurrentPieceDisplay(newPiece));
         game.getNextPieceObjectProperty().addListener((obs, oldPiece, newPiece) -> updateNextPieceDisplay(newPiece));
