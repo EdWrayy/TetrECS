@@ -25,21 +25,23 @@
 }
 
 .menuItem {
-    -fx-fill: white;
+    -fx-fill: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
     -fx-font-family: 'Orbitron';
     -fx-font-size: 32px;
     -fx-font-weight: 700;
-    -fx-border-color: black;
+    -fx-text-fill: white;
     -fx-stroke: black;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
 }
 
 .menuItem:hover {
-    -fx-fill: yellow;
+    -fx-text-fill: yellow;
 }
 
 .menuItem.selected {
-    -fx-fill: yellow;
+    -fx-text-fill: yellow;
 }
 
 .bigtitle {
@@ -50,14 +52,16 @@
     -fx-border-color: black;
     -fx-stroke: black;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+    -fx-text-alignment: center;
+    -fx-alignment: center;
 }
 
 .title {
-    -fx-fill: white;
+    -fx-text-fill: white;
     -fx-font-family: 'Orbitron';
     -fx-font-size: 32px;
     -fx-font-weight: 900;
-    -fx-border-color: black;
+    -fx-border-color: transparent;
     -fx-stroke: black;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
     -fx-text-alignment: center;
@@ -65,15 +69,15 @@
 }
 
 .heading {
-    -fx-fill: white;
-    -fx-font-family: 'Orbitron';
-    -fx-font-size: 20px;
-    -fx-font-weight: 700;
-    -fx-border-color: black;
-    -fx-stroke: black;
-    -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
-    -fx-text-alignment: center;
-    -fx-alignment: center;
+  -fx-text-fill: white;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 26px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
 }
 
 .score {
@@ -214,10 +218,17 @@ TextField {
 }
 
 .instructions {
-    -fx-font-size: 15px;
+    -fx-font-size: 12px;
     -fx-font-family: 'Orbitron';
     -fx-color: white;
     -fx-fill: white;
+    -fx-text-fill: white;
     -fx-text-alignment: center;
     -fx-alignment: center;
+    -fx-font-weight: bold;
+}
+
+.timer{
+
+
 }

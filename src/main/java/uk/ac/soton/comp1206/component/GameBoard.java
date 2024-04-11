@@ -154,8 +154,18 @@ public class GameBoard extends GridPane{
 
         //Add a mouse click handler to the block to trigger GameBoard blockClicked method
         block.setOnMouseClicked(e -> blockClicked(e, block));
-        block.setOnMouseEntered(e->block.setHovering());
-        block.setOnMouseExited(e->block.paint());
+        block.setOnMouseEntered(e->{
+            block.setHovering();
+            if(block.getX() == 1 && block.getY() ==1 && (this instanceof InstructionsPieceBoard || this instanceof PieceBoard)){
+                block.addCenterRing();
+            }
+        });
+        block.setOnMouseExited(e->{
+            block.paint();
+            if(block.getX() == 1 && block.getY() ==1 && (this instanceof InstructionsPieceBoard || this instanceof PieceBoard)){
+                block.addCenterRing();
+            }
+        });
 
         return block;
     }

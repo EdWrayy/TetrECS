@@ -13,7 +13,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
+import uk.ac.soton.comp1206.component.InstructionsPieceBoard;
 import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
@@ -22,9 +25,13 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 
 import java.net.URL;
 
+
+
 public class InstructionsScene extends BaseScene{
 
+    Multimedia multimedia;
 
+    private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
 
     /**
      * Create a new scene, passing in the GameWindow the scene will be displayed in
@@ -58,31 +65,36 @@ public class InstructionsScene extends BaseScene{
         instructionsPane.getChildren().add(mainPane);
 
         VBox instructions = new VBox();
-        instructions.setSpacing(10);
-        instructions.setPadding(new Insets(10,10,10,10));
+        instructions.setSpacing(5);
+        instructions.setPadding(new Insets(5,5,5,5));
         instructions.setAlignment(Pos.CENTER);
         mainPane.setTop(instructions);
 
+        multimedia = new Multimedia();
+        multimedia.playBackgroundMusic("src/main/resources/music/menu.mp3");
+        logger.info("Instructions Music Playing");
+
         Label title = new Label("How to Play");
         title.getStyleClass().add("title");
-        Label description = new Label("TetrECS is a fast paced gravity free block game where you must fit pieces \n into the grid before the timer runs out. If unsuccessful you will \n lose a life, lose 3 lives and you are out!" );
+        Label description = new Label("TetrECS is a fast paced gravity free block game where you must fit pieces into the grid before the timer runs out. \n If unsuccessful you will lose a life, lose 3 lives and you are out!" );
         description.getStyleClass().add("instructions");
         Label piecesLabel = new Label("Game Pieces");
         piecesLabel.getStyleClass().add("heading");
         URL imageUrl = getClass().getResource("/images/Instructions.png");
         Image instructionsImage = new Image(imageUrl.toString());
         ImageView instructionsImageView = new ImageView(instructionsImage);
-        instructionsImageView.setFitHeight(400);
-        instructionsImageView.setFitWidth(800);
+        instructionsImageView.setFitHeight(290);
+        instructionsImageView.setFitWidth(600);
         instructionsImageView.setPreserveRatio(true);
 
 
 
 
         GridPane piecesGrid = new GridPane();
+        piecesGrid.setAlignment(Pos.CENTER);
         piecesGrid.setPadding(new Insets(10, 10, 10, 10));
-        piecesGrid.setVgap(5);
-        piecesGrid.setHgap(5);
+        piecesGrid.setVgap(2);
+        piecesGrid.setHgap(2);
 
 
         instructions.getChildren().add(title);
@@ -94,49 +106,49 @@ public class InstructionsScene extends BaseScene{
 
 
         /**Adding the different pieces to the gridpane*/
-        PieceBoard pieceBoard0 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard0 = new InstructionsPieceBoard();
         GamePiece gamePiece0 = GamePiece.createPiece(0);
 
-        PieceBoard pieceBoard1 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard1 = new InstructionsPieceBoard();
         GamePiece gamePiece1 = GamePiece.createPiece(1);
 
-        PieceBoard pieceBoard2 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard2 = new InstructionsPieceBoard();
         GamePiece gamePiece2 = GamePiece.createPiece(2);
 
-        PieceBoard pieceBoard3 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard3 = new InstructionsPieceBoard();
         GamePiece gamePiece3 = GamePiece.createPiece(3);
 
-        PieceBoard pieceBoard4 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard4 = new InstructionsPieceBoard();
         GamePiece gamePiece4 = GamePiece.createPiece(4);
 
-        PieceBoard pieceBoard5 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard5 = new InstructionsPieceBoard();
         GamePiece gamePiece5 = GamePiece.createPiece(5);
 
-        PieceBoard pieceBoard6 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard6 = new InstructionsPieceBoard();
         GamePiece gamePiece6 = GamePiece.createPiece(6);
 
-        PieceBoard pieceBoard7 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard7 = new InstructionsPieceBoard();
         GamePiece gamePiece7 = GamePiece.createPiece(7);
 
-        PieceBoard pieceBoard8 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard8 = new InstructionsPieceBoard();
         GamePiece gamePiece8 = GamePiece.createPiece(8);
 
-        PieceBoard pieceBoard9 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard9 = new InstructionsPieceBoard();
         GamePiece gamePiece9 = GamePiece.createPiece(9);
 
-        PieceBoard pieceBoard10 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard10 = new InstructionsPieceBoard();
         GamePiece gamePiece10 = GamePiece.createPiece(10);
 
-        PieceBoard pieceBoard11 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard11 = new InstructionsPieceBoard();
         GamePiece gamePiece11 = GamePiece.createPiece(11);
 
-        PieceBoard pieceBoard12 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard12 = new InstructionsPieceBoard();
         GamePiece gamePiece12 = GamePiece.createPiece(12);
 
-        PieceBoard pieceBoard13 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard13 = new InstructionsPieceBoard();
         GamePiece gamePiece13 = GamePiece.createPiece(13);
 
-        PieceBoard pieceBoard14 = new PieceBoard();
+        InstructionsPieceBoard pieceBoard14 = new InstructionsPieceBoard();
         GamePiece gamePiece14 = GamePiece.createPiece(14);
 
 
@@ -171,7 +183,9 @@ public class InstructionsScene extends BaseScene{
     }
 
     private void showMenu(KeyEvent event) {
+        multimedia.stopMusic();
         gameWindow.startMenu();
+        logger.info("Instructions Music Stopped");
     }
 
 }

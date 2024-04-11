@@ -3,11 +3,14 @@ package uk.ac.soton.comp1206.scene;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
@@ -35,8 +38,16 @@ public class ChallengeScene extends BaseScene{
     }
 
     public void timerBar(double progress){
-        Platform.runLater(() -> timerBar.setProgress(progress));
-        logger.info("The timer bar is currently at "+progress);
+        Platform.runLater(() -> {
+            GraphicsContext gc = timerBar.getGraphicsContext2D();
+            gc.clearRect(0,0,900,200);
+            Color fillColor = Color.rgb(250,(int)(250*progress),0);
+            gc.setFill(fillColor);
+            double fillAmount = progress*800;
+            gc.fillRect(0,0, fillAmount, 20);
+        });
+
+
     }
 
 
@@ -48,7 +59,7 @@ public class ChallengeScene extends BaseScene{
     Label multiplierLabel = new Label();
     Label livesLabel = new Label();
 
-    ProgressBar timerBar;
+    Canvas timerBar;
 
     Multimedia multimedia;
 
@@ -102,12 +113,15 @@ public class ChallengeScene extends BaseScene{
         game.setFailToPlaceListener(this::failedToPlace);
         game.setBlockClearedListener(this::blockCleared);
         game.setGameLoopListener(this::timerBar);
+        game.setLifeLostListener(this::lifeLost);
+        game.setGameOverListener(this::gameOver);
         board.setOnBlockClick(this::blockClicked);
 
 
         multimedia = new Multimedia();
         String musicFilePath = "src/main/resources/music/game.wav";
         multimedia.playBackgroundMusic(musicFilePath);
+        logger.info("Challenge Music Playing");
 
         scoreLabel.textProperty().bind(Bindings.concat("Score:\n", game.getScoreProperty().asString()));
         scoreLabel.setPrefSize(130, 70);
@@ -125,7 +139,8 @@ public class ChallengeScene extends BaseScene{
         livesLabel.setPrefSize(130, 70);
         livesLabel.getStyleClass().add("lives");
 
-        timerBar = new ProgressBar();
+        timerBar = new Canvas(800, 20);
+        timerBar.getStyleClass().add("timer");
 
 
         game.getCurrentPieceObjectProperty().addListener((obs, oldPiece, newPiece) -> updateCurrentPieceDisplay(newPiece));
@@ -142,6 +157,8 @@ public class ChallengeScene extends BaseScene{
         labels.getChildren().add(levelLabel);
         labels.getChildren().add(multiplierLabel);
         labels.getChildren().add(livesLabel);
+
+        mainPane.setBottom(timerBar);
 
         VBox pieceDisplays = new VBox();
         pieceDisplays.setPadding(new Insets(10, 10, 10, 10));
@@ -218,7 +235,7 @@ public class ChallengeScene extends BaseScene{
     public void handleKeyPress(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
             case ESCAPE:
-                showMenu(keyEvent);
+                endGame(keyEvent);
                 break;
             case ENTER, X:
                 game.blockClicked(board.getBlock(currentAimX,currentAimY));
@@ -288,9 +305,13 @@ public class ChallengeScene extends BaseScene{
         gameBlock.setHovering();
     }
 
-
-    private void showMenu(KeyEvent keyEvent) {
+    public void gameOver(){
+        multimedia.stopMusic();
         gameWindow.startMenu();
+        logger.info("Challenge Music Paused");
+    }
+    private void endGame(KeyEvent keyEvent) {
+        game.stopLoop();
     }
 
 
@@ -307,8 +328,10 @@ public class ChallengeScene extends BaseScene{
     public void blockCleared(int x, int y) {
         GameBlock fadeBlock  = board.getBlock(x,y);
         board.clearBlock(x, y);
+    }
 
-
+    public void lifeLost(){
+        multimedia.playAudio("src/main/resources/sounds/lifelose.wav");
     }
 }
 

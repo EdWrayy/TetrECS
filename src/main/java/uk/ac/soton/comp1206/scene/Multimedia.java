@@ -17,6 +17,8 @@ public class Multimedia {
      * Checks if audio is already playing and stops it if so
      * Plays specified audio file
      * */
+
+
     public void playAudio(String audioFilePath) {
         if (audioPlayer != null) {
             audioPlayer.stop();
@@ -44,4 +46,7 @@ public class Multimedia {
         musicPlayer.play();
     }
 
+    public void stopMusic(){
+        musicPlayer.stop();
+    }
 }

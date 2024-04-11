@@ -6,10 +6,7 @@ import javafx.event.ActionEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
-import uk.ac.soton.comp1206.event.BlockClearedListener;
-import uk.ac.soton.comp1206.event.FailToPlaceListener;
-import uk.ac.soton.comp1206.event.GameLoopListener;
-import uk.ac.soton.comp1206.event.NextPieceListener;
+import uk.ac.soton.comp1206.event.*;
 import uk.ac.soton.comp1206.scene.ChallengeScene;
 
 import java.util.*;
@@ -34,6 +31,8 @@ public class Game {
 
     BlockClearedListener blockClearedListener;
 
+    LifeLostListener lifeLostListener;
+
     /**
      * Number of columns
      */
@@ -47,6 +46,8 @@ public class Game {
     private FailToPlaceListener failToPlaceListener;
 
     private GameLoopListener gameLoopListener;
+
+    private GameOverListener gameOverListener;
 
     private ObjectProperty<GamePiece> currentPiece = new SimpleObjectProperty<>();
 
@@ -165,6 +166,10 @@ public class Game {
         this.gameLoopListener = gameLoopListener;
     }
 
+    public void setLifeLostListener(LifeLostListener lifeLostListener){this.lifeLostListener = lifeLostListener;}
+
+    public void setGameOverListener(GameOverListener gameOverListener){this.gameOverListener = gameOverListener;}
+
     /**
      * Start the game
      */
@@ -202,6 +207,7 @@ public class Game {
     public void gameLoop(){
         Platform.runLater(() -> {
             setLives(getLivesValue() - 1);
+            lifeLostListener.lifeLost();
             setMultiplier(1);
             currentPiece.set(spawnPiece());
             logger.info("Time ran out, gameloop method has been called");
@@ -246,6 +252,7 @@ public class Game {
             scheduler.shutdownNow();
         }
         logger.info("Game loop has been stopped");
+        gameOverListener.gameOver();
     }
 
     private void resetTimer(){
