@@ -211,8 +211,12 @@ public class Game {
             setMultiplier(1);
             currentPiece.set(spawnPiece());
             logger.info("Time ran out, gameloop method has been called");
+            if (progressFuture != null && !progressFuture.isCancelled()) {
+                progressFuture.cancel(true);
+            }
             startProgressUpdater();
             checkLives();
+
         });
     }
 
@@ -238,7 +242,9 @@ public class Game {
     private void checkLives(){
         if(getLivesValue()<0){
             stopLoop();
+            logger.info("Lives below zero, loop stopped");
             //End game
+            gameOverListener.gameOver(this);
         }
     }
 
@@ -252,7 +258,6 @@ public class Game {
             scheduler.shutdownNow();
         }
         logger.info("Game loop has been stopped");
-        gameOverListener.gameOver();
     }
 
     private void resetTimer(){
@@ -264,6 +269,19 @@ public class Game {
             startProgressUpdater();
         }
     }
+
+    public int getTimerDelay(){
+        int newTimerDelay = 12000-(500*getLevelValue());
+        if(newTimerDelay<=2500){
+            this.timerDelay=2500;
+            return this.timerDelay;
+        }
+        else{
+            this.timerDelay = newTimerDelay;
+            return this.timerDelay;
+        }
+    }
+
 
 
 
@@ -462,17 +480,6 @@ public class Game {
     }
 
 
-    public int getTimerDelay(){
-        int newTimerDelay = 12000-(500*this.getLevelValue());
-        if(newTimerDelay<=2500){
-            this.timerDelay=2500;
-            return this.timerDelay;
-        }
-        else{
-            this.timerDelay = newTimerDelay;
-            return this.timerDelay;
-        }
-    }
 
 
 }

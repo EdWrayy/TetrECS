@@ -3,6 +3,7 @@ package uk.ac.soton.comp1206.scene;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
@@ -11,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
@@ -22,6 +24,11 @@ import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * The Single Player challenge scene. Holds the UI for the single player challenge mode in the game.
@@ -58,6 +65,8 @@ public class ChallengeScene extends BaseScene{
     Label levelLabel = new Label();
     Label multiplierLabel = new Label();
     Label livesLabel = new Label();
+
+
 
     Canvas timerBar;
 
@@ -124,23 +133,26 @@ public class ChallengeScene extends BaseScene{
         logger.info("Challenge Music Playing");
 
         scoreLabel.textProperty().bind(Bindings.concat("Score:\n", game.getScoreProperty().asString()));
-        scoreLabel.setPrefSize(130, 70);
-        scoreLabel.getStyleClass().add("score");
+        scoreLabel.setPrefSize(160, 70);
+        scoreLabel.getStyleClass().add("heading");
 
         levelLabel.textProperty().bind(Bindings.concat("Level:\n", game.getLevelProperty().asString()));
-        levelLabel.setPrefSize(130, 70);
-        levelLabel.getStyleClass().add("level");
+        levelLabel.setPrefSize(160, 70);
+        levelLabel.getStyleClass().add("heading");
 
         multiplierLabel.textProperty().bind(Bindings.concat("Multiplier:\n", game.getMultiplierProperty().asString()));
-        multiplierLabel.setPrefSize(130, 70);
-        multiplierLabel.getStyleClass().add("score");
+        multiplierLabel.setPrefSize(160, 70);
+        multiplierLabel.getStyleClass().add("heading");
 
         livesLabel.textProperty().bind(Bindings.concat("Lives:\n", game.getLivesProperty().asString()));
-        livesLabel.setPrefSize(130, 70);
-        livesLabel.getStyleClass().add("lives");
+        livesLabel.setPrefSize(160, 70);
+        livesLabel.getStyleClass().add("heading");
+
+        Label highScoreLabel = new Label("High Score:\n" + getHighScore());
+        highScoreLabel.getStyleClass().add("heading");
 
         timerBar = new Canvas(800, 20);
-        timerBar.getStyleClass().add("timer");
+        timerBar.getStyleClass().add("heading");
 
 
         game.getCurrentPieceObjectProperty().addListener((obs, oldPiece, newPiece) -> updateCurrentPieceDisplay(newPiece));
@@ -149,8 +161,9 @@ public class ChallengeScene extends BaseScene{
 
         mainPane.setCenter(board);
         HBox labels = new HBox();
+        labels.setAlignment(Pos.CENTER);
         labels.setPadding(new Insets(10, 10, 10, 10));
-        labels.setSpacing(10);
+        labels.setSpacing(20);
 
         mainPane.setTop(labels);
         labels.getChildren().add(scoreLabel);
@@ -163,20 +176,24 @@ public class ChallengeScene extends BaseScene{
         VBox pieceDisplays = new VBox();
         pieceDisplays.setPadding(new Insets(10, 10, 10, 10));
         pieceDisplays.setSpacing(10);
+        pieceDisplays.setAlignment(Pos.CENTER);
         mainPane.setRight(pieceDisplays);
 
         currentPieceDisplay = new PieceBoard();
         nextPieceDisplay = new PieceBoard();
 
         currentPieceLabel = new Label("Current Piece");
-        currentPieceLabel.getStyleClass().add("lives");
+        currentPieceLabel.setPrefSize(160, 70);
+        currentPieceLabel.getStyleClass().add("pieceDisplays");
         nextPieceLabel = new Label("Next Piece");
-        nextPieceLabel.getStyleClass().add("lives");
+        nextPieceLabel.setPrefSize(160, 70);
+        nextPieceLabel.getStyleClass().add("pieceDisplays");
 
         pieceDisplays.getChildren().add(currentPieceLabel);
         pieceDisplays.getChildren().add(currentPieceDisplay);
         pieceDisplays.getChildren().add(nextPieceLabel);
         pieceDisplays.getChildren().add(nextPieceDisplay);
+        pieceDisplays.getChildren().add(highScoreLabel);
 
 
 
@@ -268,6 +285,9 @@ public class ChallengeScene extends BaseScene{
             case RIGHT,D :
                 currentAimMoveRight();
                 break;
+            case TAB :
+               game.gameLoop();
+               break;
         }
     }
 
@@ -305,13 +325,15 @@ public class ChallengeScene extends BaseScene{
         gameBlock.setHovering();
     }
 
-    public void gameOver(){
+    public void gameOver(Game game){
         multimedia.stopMusic();
-        gameWindow.startMenu();
+        gameWindow.startScores(game);
         logger.info("Challenge Music Paused");
+        scene.setOnKeyPressed(null);
     }
     private void endGame(KeyEvent keyEvent) {
         game.stopLoop();
+        gameWindow.startMenu();
     }
 
 
@@ -333,6 +355,28 @@ public class ChallengeScene extends BaseScene{
     public void lifeLost(){
         multimedia.playAudio("src/main/resources/sounds/lifelose.wav");
     }
+
+    private int getHighScore(){
+        try {
+            BufferedReader reader = Files.newBufferedReader(Paths.get("src/main/resources/IO/scores.txt"));
+            int highScore = -1;
+            String line;
+            boolean firstLineRead = false;
+            while ((line = reader.readLine()) != null && !firstLineRead) {
+                String[] parts = line.split(":");
+                if (parts.length == 2) {
+                    highScore = Integer.parseInt(parts[1].trim());
+                    firstLineRead = true;
+                }
+            }
+            return highScore;
+        } catch (IOException e) {
+           return -1;
+        }
+    }
+
+
+
 }
 
 

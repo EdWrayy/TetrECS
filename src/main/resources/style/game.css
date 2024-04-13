@@ -69,9 +69,21 @@
 }
 
 .heading {
-  -fx-text-fill: white;
+      -fx-text-fill: white;
       -fx-font-family: 'Orbitron';
       -fx-font-size: 26px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+}
+
+.pieceDisplays {
+  -fx-text-fill: white;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 20px;
       -fx-font-weight: 900;
       -fx-border-color: transparent;
       -fx-stroke: black;
@@ -127,9 +139,30 @@
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
 }
 
+.VBox {
+    -fx-background-color: transparent;
+    -fx-fill: transparent;
+    -fx-border-color: transparent;
+}
+
+
 .scorelist {
     -fx-font-size: 20px;
     -fx-font-family: 'Orbitron';
+    -fx-fill: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.listcell {
+    -fx-padding: 5px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-family: 'Orbitron';
+    -fx-font-weight: bold;
+
+
 }
 
 .scoreitem {
@@ -228,7 +261,45 @@ TextField {
     -fx-font-weight: bold;
 }
 
-.timer{
-
-
+.list-view .scroll-bar {
+    -fx-opacity: 0;
 }
+
+.gameOver{
+         -fx-text-fill: red;
+         -fx-font-family: 'Orbitron';
+         -fx-font-size: 50px;
+         -fx-font-weight: 900;
+         -fx-border-color: transparent;
+         -fx-stroke: black;
+         -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+         -fx-text-alignment: center;
+         -fx-alignment: center;
+}
+
+.yourScore {
+      -fx-text-fill: orange;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 40px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+}
+
+
+
+.highScores {
+      -fx-text-fill: yellow;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 30px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+}
+

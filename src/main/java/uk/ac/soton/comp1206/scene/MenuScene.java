@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -110,9 +111,18 @@ public class MenuScene extends BaseScene {
      */
     @Override
     public void initialise() {
-
+        if (scene != null) {
+            scene.setOnKeyPressed(this::handleKeyPress);
+        }
     }
 
+    public void handleKeyPress(KeyEvent keyEvent){
+        switch(keyEvent.getCode()) {
+            case ESCAPE:
+                logger.info("ESC pressed");
+                break;
+        }
+    }
     /**
      * Handle when the Start Game button is pressed
      *

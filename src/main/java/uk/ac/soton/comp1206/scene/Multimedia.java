@@ -43,7 +43,7 @@ public class Multimedia {
         Media musicFile = new Media(new File(musicFilePath).toURI().toString());
         musicPlayer = new MediaPlayer(musicFile);
         musicPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Loops
-        musicPlayer.play();
+        //musicPlayer.play();
     }
 
     public void stopMusic(){
