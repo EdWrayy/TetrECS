@@ -148,7 +148,12 @@ public class ChallengeScene extends BaseScene{
         livesLabel.setPrefSize(160, 70);
         livesLabel.getStyleClass().add("heading");
 
-        Label highScoreLabel = new Label("High Score:\n" + getHighScore());
+        int highScore;
+        if(getHighScore() == -1){highScore = 5000;}
+        else{
+            highScore = getHighScore();
+        }
+        Label highScoreLabel = new Label("High Score:\n" + highScore);
         highScoreLabel.getStyleClass().add("heading");
 
         timerBar = new Canvas(800, 20);

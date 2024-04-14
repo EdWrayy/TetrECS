@@ -241,6 +241,7 @@ public class Game {
 
     private void checkLives(){
         if(getLivesValue()<0){
+            setLives(0);
             stopLoop();
             logger.info("Lives below zero, loop stopped");
             //End game

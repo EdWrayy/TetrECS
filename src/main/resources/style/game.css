@@ -147,20 +147,24 @@
 
 
 .scorelist {
-    -fx-font-size: 20px;
-    -fx-font-family: 'Orbitron';
+
     -fx-fill: transparent;
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
 
 .listcell {
-    -fx-padding: 5px;
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-text-fill: white;
     -fx-font-family: 'Orbitron';
     -fx-font-weight: bold;
+    -fx-font-size: 20px;
+    -fx-text-alignment: center;
+    -fx-padding: 2px 2px;
+    -fx-border-width: 0px;
+    -fx-border-insets: 0px;
+
 
 
 }
@@ -280,7 +284,7 @@ TextField {
 .yourScore {
       -fx-text-fill: orange;
       -fx-font-family: 'Orbitron';
-      -fx-font-size: 40px;
+      -fx-font-size: 36px;
       -fx-font-weight: 900;
       -fx-border-color: transparent;
       -fx-stroke: black;
@@ -294,7 +298,7 @@ TextField {
 .highScores {
       -fx-text-fill: yellow;
       -fx-font-family: 'Orbitron';
-      -fx-font-size: 30px;
+      -fx-font-size: 28px;
       -fx-font-weight: 900;
       -fx-border-color: transparent;
       -fx-stroke: black;
@@ -302,4 +306,88 @@ TextField {
       -fx-text-alignment: center;
       -fx-alignment: center;
 }
+
+.scores{
+ -fx-text-fill: white;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 24px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+      -fx-padding: 2px 2px;
+      -fx-border-width: 0px;
+      -fx-border-insets: 0px;
+}
+
+.onlinescores{
+ -fx-text-fill: white;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 24px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-padding: 2px 2px;
+      -fx-border-width: 0px;
+      -fx-border-insets: 0px;
+      -fx-text-alignment: left;
+      -fx-alignment: center_left;
+}
+
+.dialog{
+     -fx-background-image: url("../images/1.jpg");
+     -fx-font-family: 'Orbitron';
+     -fx-font-size: 20px;
+     -fx-text-fill: white;
+     -fx-font-weight: 900;
+     -fx-border-color: transparent;
+
+
+}
+
+.dialog .header-panel{
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-background-color: transparent;
+    -fx-text-alignment: center;
+
+}
+
+.dialog .header-panel .label{
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.dialog .content-label {
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+
+}
+
+.dialog-button{
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+    -fx-border-color: transparent;
+}
+
+.dialog-button:hover {
+    -fx-text-fill: yellow;
+}
+
+
+
+.button{}
 
