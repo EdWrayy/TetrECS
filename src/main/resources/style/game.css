@@ -68,6 +68,54 @@
     -fx-alignment: center;
 }
 
+.multiplayer {
+    -fx-text-fill: white;
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-border-color: transparent;
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+    -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.currentGames{
+       -fx-text-fill: white;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 24px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+}
+
+.hostGame{
+    -fx-fill: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: white;
+    -fx-stroke: black;
+    -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+}
+.hostGame:hover{
+    -fx-fill: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: yellow;
+    -fx-stroke: black;
+    -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+}
+
 .heading {
       -fx-text-fill: white;
       -fx-font-family: 'Orbitron';

@@ -42,7 +42,7 @@ public class ScoresScene extends BaseScene {
 
     Communicator communicator;
 
-    String name;
+    String name = "User";
     Game game;
 
     ScoresList scoresList;
@@ -183,7 +183,7 @@ public class ScoresScene extends BaseScene {
 
         communicator = gameWindow.getCommunicator();
         communicator.addListener(this::loadOnlineScores);
-        communicator.send("HISCORES DEFAULT");
+        communicator.send("HISCORES");
         try{
             Thread.sleep(100);
         }catch(Exception ignored){}
@@ -350,6 +350,7 @@ public class ScoresScene extends BaseScene {
             }
             remoteScores.add(new Pair<>(name, score));
             logger.info("Added new pair name: "+name+ " score: " +score);
+            communicator.send("HISCORE "+name+":"+score);
         }
 
 
@@ -361,6 +362,8 @@ public class ScoresScene extends BaseScene {
         Collections.sort(remoteScores, comparator);
         logger.info("Sorted online scores");
     }
+
+
 
 
 

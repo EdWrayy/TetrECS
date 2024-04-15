@@ -88,20 +88,35 @@ public class MenuScene extends BaseScene {
         mainPane.setBottom(buttonLayout);
 
         //For now, let us just add a button that starts the game. I'm sure you'll do something way better.
-        var playButton = new Button("Play");
+        var playButton = new Button("Single Player");
         playButton.getStyleClass().add("menuItem");
         //Bind the button action to the startGame method in the menu
         playButton.setOnAction(this::startGame);
         playButton.setOnMouseEntered(e -> playButton.getStyleClass().add("menuItem:hover"));
         playButton.setOnMouseExited(e -> playButton.getStyleClass().add("menuItem"));
 
-        var instructionsButton = new Button("Instructions");
+        var instructionsButton = new Button("How To Play");
         instructionsButton.setOnAction(this::showInstructions);
         instructionsButton.getStyleClass().add("menuItem");
         instructionsButton.setOnMouseEntered(e -> instructionsButton.getStyleClass().add("menuItem:hover"));
         instructionsButton.setOnMouseExited(e -> instructionsButton.getStyleClass().add("menuItem"));
 
-        buttonLayout.getChildren().addAll(playButton, instructionsButton);
+        var multiPlayerButton = new Button("Multi Player");
+        multiPlayerButton.getStyleClass().add("menuItem");
+        multiPlayerButton.setOnAction(this::startMultiPlayer);
+        multiPlayerButton.setOnMouseEntered(e ->multiPlayerButton.getStyleClass().add("menuItem:hover"));
+        multiPlayerButton.setOnMouseExited(e -> multiPlayerButton.getStyleClass().add("menuItem"));
+
+        var exitButton = new Button("Exit");
+        exitButton.getStyleClass().add("menuItem");
+        exitButton.setOnAction(this::exit);
+        exitButton.setOnMouseEntered(e ->exitButton.getStyleClass().add("menuItem:hover"));
+        exitButton.setOnMouseExited(e -> exitButton.getStyleClass().add("menuItem"));
+
+
+        buttonLayout.getChildren().addAll(playButton, multiPlayerButton, instructionsButton, exitButton);
+
+
     }
 
 
@@ -140,4 +155,13 @@ public class MenuScene extends BaseScene {
         logger.info("Menu Music Paused");
     }
 
+    private void startMultiPlayer(ActionEvent event){
+        multimedia.stopMusic();
+        gameWindow.startMultiPlayer();
+        logger.info("Menu Music Paused");
+    }
+
+    private void exit(ActionEvent event){
+        System.exit(0);
+    }
 }
