@@ -58,8 +58,10 @@ public class GameWindow {
         //Setup communicator
         communicator = new Communicator("ws://ofb-labs.soton.ac.uk:9700");
 
+        startIntroScene();
+
         //Go to menu
-        startMenu();
+        //startMenu();
     }
 
     /**
@@ -77,6 +79,8 @@ public class GameWindow {
     /**
      * Display the main menu
      */
+
+    public void startIntroScene(){loadScene(new IntroScene(this));}
     public void startMenu() {loadScene(new MenuScene(this));}
 
     /**

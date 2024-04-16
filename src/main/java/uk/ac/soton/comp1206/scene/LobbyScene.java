@@ -1,5 +1,6 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -7,8 +8,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -16,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +28,8 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
@@ -40,6 +44,8 @@ public class LobbyScene extends BaseScene{
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> requestLoopHandle = null;
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
     Multimedia multimedia;
 
     Communicator communicator;
@@ -48,6 +54,22 @@ public class LobbyScene extends BaseScene{
 
     LobbyButtons lobbyButtons;
 
+    TextField inputField = new TextField();
+
+    VBox chatView = new VBox();
+
+    boolean isHost = false;
+
+    Button startButton;
+
+    Label lobbyName = new Label("");
+    HBox playerList = new HBox();
+
+    boolean inLobby = false;
+
+    String nickName;
+
+    VBox chatMessages = new VBox();
 
 
     /**
@@ -90,7 +112,7 @@ public class LobbyScene extends BaseScene{
         lobbies = new SimpleListProperty<>(FXCollections.observableArrayList());
         lobbyButtons = new LobbyButtons();
         lobbyButtons.getLobbies().bindBidirectional(this.lobbies);
-        lobbyButtons.setLobbyJoinListener(this::lobbyJoined);
+        lobbyButtons.setLobbyJoinListener(this::joinLobby);
 
 
         var mainPane = new BorderPane();
@@ -111,30 +133,96 @@ public class LobbyScene extends BaseScene{
         VBox gamesView = new VBox();
         gamesView.setPadding(new Insets(10,10,10,10));
         gamesView.setSpacing(20);
+        gamesView.setPrefWidth(350);
         Label playMultiplayer = new Label("Play Multiplayer");
         playMultiplayer.getStyleClass().add("multiplayer");
         Button hostNewGame = new Button("Host New Game");
         hostNewGame.getStyleClass().add("hostGame");
-        hostNewGame.setOnAction(this::hostGame);
+        hostNewGame.setOnAction(this::getInput);
+        inputField.setPromptText("Enter a lobby name: ");
+        inputField.getStyleClass().add("gameInputField");
+        inputField.setVisible(false);
+        inputField.setOnAction(event -> {
+            hostGame(inputField.getText());
+            inputField.clear();
+            inputField.setVisible(false);
+        });
         hostNewGame.setOnMouseEntered(e -> hostNewGame.getStyleClass().add("hostGame:hover"));
         hostNewGame.setOnMouseExited(e -> hostNewGame.getStyleClass().add("hostGame"));
         Label currentGames = new Label("Current Games");
         currentGames.getStyleClass().add("currentGames");
 
 
-        gamesView.getChildren().addAll(playMultiplayer, hostNewGame, currentGames, lobbyButtons);
+        gamesView.getChildren().addAll(playMultiplayer, hostNewGame, inputField, currentGames, lobbyButtons);
+
+
+
+        chatView.setPadding(new Insets(10,10,10,10));
+        chatView.setSpacing(10);
+        chatView.setVisible(false);
+        chatView.getStyleClass().add("chatView");
+        chatView.setPrefWidth(400);
+        chatView.setAlignment(Pos.CENTER);
+        lobbyName.getStyleClass().add("lobbyName");
+        lobbyName.setAlignment(Pos.CENTER);
+        playerList.getStyleClass().add("playerList");
+
+        Label lobbyDescription = new Label("Welcome to the Lobby \n Type /nick NewName to change your name \n \n");
+        lobbyDescription.getStyleClass().add("chat");
+
+        ScrollPane chatWindow = new ScrollPane();
+        chatWindow.getStyleClass().add("chatWindow");
+        chatWindow.setFitToWidth(true);
+        chatWindow.setVvalue(1.0);
+        chatWindow.setContent(chatMessages);
+        chatWindow.setPrefHeight(300);
+
+        chatMessages.getStyleClass().add("chatMessages");
+        chatMessages.setFillWidth(true);
+        chatMessages.getChildren().add(lobbyDescription);
+
+        TextField messageBox = new TextField();
+        messageBox.setPromptText("Send a message");
+        messageBox.setOnAction((event -> {
+            sendMessage(messageBox.getText());
+            messageBox.clear();
+        }));
+
+
+
+        Button leaveButton = new Button("Leave Game");
+        leaveButton.getStyleClass().add("hostGame");
+        leaveButton.setOnMouseEntered(e -> leaveButton.getStyleClass().add("hostGame:hover"));
+        leaveButton.setOnMouseExited(e -> leaveButton.getStyleClass().add("hostGame"));
+        leaveButton.setOnAction(e -> leaveLobby());
+        leaveButton.setAlignment(Pos.CENTER_LEFT);
+
+        startButton = new Button("Start Game");
+        startButton.getStyleClass().add("hostGame");
+        startButton.setOnMouseEntered(e -> startButton.getStyleClass().add("hostGame:hover"));
+        startButton.setOnMouseExited(e -> startButton.getStyleClass().add("hostGame"));
+        startButton.setOnAction(e -> startGame());
+        startButton.setAlignment(Pos.CENTER_RIGHT);
+        startButton.setVisible(false);
+
+        HBox buttons = new HBox();
+        buttons.setAlignment(Pos.BOTTOM_CENTER);
+        buttons.getChildren().addAll(leaveButton,startButton);
+        chatView.getChildren().addAll(lobbyName,playerList, chatWindow, messageBox, buttons);
+
+
+
 
 
         mainPane.setLeft(gamesView);
-
-
+        mainPane.setRight(chatView);
 
 
         multimedia = new Multimedia();
         multimedia.playBackgroundMusic("src/main/resources/music/menu.mp3");
 
         communicator = gameWindow.getCommunicator();
-        communicator.addListener(this::loadLobbies);
+        communicator.addListener(this::handleNetworkLogs);
     }
 
     private void handleKeyPress(KeyEvent keyEvent){
@@ -148,24 +236,79 @@ public class LobbyScene extends BaseScene{
     }
     private void requestLoop(){
         communicator.send("LIST");
-    }
-
-
-
-    private void loadLobbies(String lobbies) {
-        String channels = lobbies.replace("CHANNELS ", "").trim();
-        String[] lines = channels.split("\n");
-        this.lobbies.clear();
-        for (String line : lines) {
-            this.lobbies.add(line);
-            logger.info("Lobby names are "+ line);
+        if(inLobby){
+            communicator.send("USERS");
         }
     }
 
 
 
-    private void lobbyJoined(String gameName){
+    private void handleNetworkLogs(String logs) {
+        if(logs.startsWith("CHANNELS")){
+            logger.info("Received Channels: " + logs);
+            String channels = logs.replace("CHANNELS ", "").trim();
+            String[] lines = channels.split("\n");
+            this.lobbies.clear();
+            for (String line : lines) {
+                this.lobbies.add(line);
+                logger.info("Lobby names are " + line);
+            }
+        }
+        if(logs.startsWith("USERS")){
+            logger.info("Received Users: " + logs);
+            String users = logs.replace("USERS ", "").trim();
+            String[] lines = users.split("\n");
+            Platform.runLater(() -> {
+                playerList.getChildren().clear();
+            });
+            for (String line : lines) {
+                final String lineF = line + "   ";
+                logger.info("Displaying user "+ line);
+                Platform.runLater(() -> {
+                    final Label label = new Label(lineF);
+                    label.getStyleClass().add("playerNames");
+                    playerList.getChildren().add(label);
+                });
+            }
+        }
+        if(logs.startsWith("MSG")){
+            logger.info("Received Messages: " + logs);
+            final String message = logs.replace("MSG ", "").trim();
+            final String time = LocalTime.now().format(formatter);
+            String[] parts = message.split(":");
+            if (parts.length >= 2) {
+                final String name = parts[0];
+                final String msg = parts[1];
+            logger.info("Displaying message "+ "["+time+"]"+" <"+name+">"+message);
+                Platform.runLater(() -> {
+                    final Label label = new Label("["+time+"]"+" <"+name+">"+msg);
+                    label.getStyleClass().add("instructions");
+                    chatMessages.getChildren().add(label);
+                });
+
+            }
+        }
+        if(logs.startsWith("ERROR")){
+            logger.info("ERROR OCCURED");
+        }
+    }
+
+
+
+    private void joinLobby(String gameName){
         logger.info("Attempting to join "+gameName);
+        if(!inLobby) {
+            chatView.setVisible(true);
+            lobbyName.setText(gameName);
+            communicator.send("JOIN " + gameName);
+            inLobby = true;
+            if(isHost){
+                startButton.setVisible(true);
+            }
+            else{
+                startButton.setVisible(false);
+            }
+        }
     }
 
     private void stopLoop() {
@@ -177,12 +320,46 @@ public class LobbyScene extends BaseScene{
         } catch (InterruptedException e) {
             scheduler.shutdownNow();
         }
-        logger.info("Game loop has been stopped");
+        logger.info("Request loop has been stopped");
     }
 
-    private void hostGame(ActionEvent event){
-
+    private void getInput(ActionEvent event){
+        inputField.setVisible(true);
+        inputField.requestFocus();
     }
+
+    private void sendMessage(String message){
+        if(message.startsWith("/nick")){
+            nickName = message.replace("/nick ", "").trim();
+            communicator.send("NICK "+nickName);
+        }
+        else {
+            communicator.send("MSG " + message);
+        }
+    }
+
+    private void hostGame(String gameName){
+        if(!inLobby) {
+            logger.info("Hosting " + gameName);
+            communicator.send("CREATE " + gameName);
+            isHost = true;
+            joinLobby(gameName);
+
+        }
+    }
+
+    private void leaveLobby(){
+        chatView.setVisible(false);
+        communicator.send("PART");
+        inLobby=false;
+        isHost=false;
+        Platform.runLater(() -> {
+            playerList.getChildren().clear();
+            chatMessages.getChildren().clear();
+        });
+    }
+
+    private void startGame(){}
 
 
 

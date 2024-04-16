@@ -262,19 +262,19 @@ public class ChallengeScene extends BaseScene{
             case ENTER, X:
                 game.blockClicked(board.getBlock(currentAimX,currentAimY));
                 break;
-            case E:
+            case E,C,CLOSE_BRACKET:
                 logger.info("Rotating current piece right");
                 game.rotateCurrentPieceRight();
                 updateCurrentPieceDisplay(game.getCurrentPiece());
                 multimedia.playAudio("src/main/resources/sounds/rotate.wav");
                 break;
-            case Q:
+            case Q,Z,OPEN_BRACKET:
                 logger.info("Rotating current piece left");
                 game.rotateCurrentPieceLeft();
                 updateCurrentPieceDisplay(game.getCurrentPiece());
                 multimedia.playAudio("src/main/resources/sounds/rotate.wav");
                 break;
-            case SPACE:
+            case SPACE, R:
                 game.swapPieces();
                 multimedia.playAudio("src/main/resources/sounds/rotate.wav");
                 break;
@@ -353,7 +353,6 @@ public class ChallengeScene extends BaseScene{
 
 
     public void blockCleared(int x, int y) {
-        GameBlock fadeBlock  = board.getBlock(x,y);
         board.clearBlock(x, y);
     }
 

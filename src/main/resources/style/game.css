@@ -93,6 +93,63 @@
       -fx-alignment: center;
 }
 
+.introScene{
+    -fx-background-color:black;
+}
+
+.gameInputField{
+
+}
+
+.chatView{
+    -fx-border-color: white;
+    -fx-border-width: 3;
+    -fx-background-color:transparent
+}
+
+.lobbyName{
+       -fx-text-fill: white;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 26px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+}
+
+
+.playerNames{
+       -fx-text-fill: white;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 16px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+}
+
+.chatWindow{
+    -fx-background-color: transparent;
+}
+.chatWindow .viewport {
+    -fx-background-color: transparent;
+}
+
+
+.chatMessages{
+    -fx-background-color: transparent;
+}
+
+.playerList{
+-fx-border-color: transparent;
+-fx-background-color:transparent;
+
+  }
+
 .hostGame{
     -fx-fill: transparent;
     -fx-background-color: transparent;
@@ -311,6 +368,17 @@ TextField {
     -fx-text-alignment: center;
     -fx-alignment: center;
     -fx-font-weight: bold;
+    -fx-background-color:transparent;
+}
+
+.chat {
+    -fx-font-size: 12px;
+    -fx-font-family: 'Orbitron';
+    -fx-color: white;
+    -fx-fill: white;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-color:transparent;
 }
 
 .list-view .scroll-bar {
