@@ -482,7 +482,7 @@ public class Game {
         this.nextPiece.set(temporaryPiece);
     }
 
-    /**This method purely exists to be overriden in the multiplayer version*/
+    /**This method purely exists to be overriden in the multiplayer version.*/
     public void getPieceMultiplayer(){}
 
 }
