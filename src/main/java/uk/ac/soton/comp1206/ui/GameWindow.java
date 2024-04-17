@@ -94,6 +94,8 @@ public class GameWindow {
 
     public void startMultiPlayer(){loadScene(new LobbyScene(this));}
 
+    public void startMultiPlayerGame(){loadScene(new MultiplayerScene(this));}
+
     /**
      * Setup the default settings for the stage itself (the window), such as the title and minimum width and height.
      */

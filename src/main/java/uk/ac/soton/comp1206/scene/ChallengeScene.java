@@ -22,6 +22,7 @@ import uk.ac.soton.comp1206.event.BlockClearedListener;
 import uk.ac.soton.comp1206.event.FailToPlaceListener;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
+import uk.ac.soton.comp1206.game.MultiplayerGame;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 
@@ -36,28 +37,6 @@ import java.nio.file.Paths;
 public class ChallengeScene extends BaseScene{
 
 
-    public void failedToPlace(boolean failedToPlace) {
-        if (failedToPlace) {
-            multimedia.playAudio("src/main/resources/sounds/fail.wav");
-        } else {
-            multimedia.playAudio("src/main/resources/sounds/place.wav");
-        }
-    }
-
-    public void timerBar(double progress){
-        Platform.runLater(() -> {
-            GraphicsContext gc = timerBar.getGraphicsContext2D();
-            gc.clearRect(0,0,900,200);
-            Color fillColor = Color.rgb(250,(int)(250*progress),0);
-            gc.setFill(fillColor);
-            double fillAmount = progress*800;
-            gc.fillRect(0,0, fillAmount, 20);
-        });
-
-
-    }
-
-
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
     protected Game game;
 
@@ -65,6 +44,12 @@ public class ChallengeScene extends BaseScene{
     Label levelLabel = new Label();
     Label multiplierLabel = new Label();
     Label livesLabel = new Label();
+
+    BorderPane mainPane;
+
+    VBox pieceDisplays;
+
+    Label highScoreLabel;
 
 
 
@@ -82,6 +67,9 @@ public class ChallengeScene extends BaseScene{
     Label nextPieceLabel;
 
     GameBoard board;
+
+    HBox labels;
+
 
     int currentAimX;
     int currentAimY;
@@ -101,8 +89,9 @@ public class ChallengeScene extends BaseScene{
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
-
-        setupGame();
+        if(this.game == null) {
+            setupGame();
+        }
 
         root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
 
@@ -112,7 +101,7 @@ public class ChallengeScene extends BaseScene{
         challengePane.getStyleClass().add("challenge-background");
         root.getChildren().add(challengePane);
 
-        var mainPane = new BorderPane();
+        mainPane = new BorderPane();
         challengePane.getChildren().add(mainPane);
         this.board = new GameBoard(game.getGrid(), gameWindow.getWidth() / 2, gameWindow.getWidth() / 2);
         board.getStyleClass().add("gameboard");
@@ -153,7 +142,7 @@ public class ChallengeScene extends BaseScene{
         else{
             highScore = getHighScore();
         }
-        Label highScoreLabel = new Label("High Score:\n" + highScore);
+        highScoreLabel = new Label("High Score:\n" + highScore);
         highScoreLabel.getStyleClass().add("heading");
 
         timerBar = new Canvas(800, 20);
@@ -165,7 +154,7 @@ public class ChallengeScene extends BaseScene{
 
 
         mainPane.setCenter(board);
-        HBox labels = new HBox();
+        labels = new HBox();
         labels.setAlignment(Pos.CENTER);
         labels.setPadding(new Insets(10, 10, 10, 10));
         labels.setSpacing(20);
@@ -178,7 +167,7 @@ public class ChallengeScene extends BaseScene{
 
         mainPane.setBottom(timerBar);
 
-        VBox pieceDisplays = new VBox();
+        pieceDisplays = new VBox();
         pieceDisplays.setPadding(new Insets(10, 10, 10, 10));
         pieceDisplays.setSpacing(10);
         pieceDisplays.setAlignment(Pos.CENTER);
@@ -235,6 +224,13 @@ public class ChallengeScene extends BaseScene{
 
         //Start new game
         game = new Game(5, 5);
+    }
+
+    public void setupGame(MultiplayerGame game) {
+        logger.info("Starting a new challenge");
+
+        //Start new game
+        this.game = game;
     }
 
     /**
@@ -342,11 +338,11 @@ public class ChallengeScene extends BaseScene{
     }
 
 
-    private void updateCurrentPieceDisplay(GamePiece piece) {
+    protected void updateCurrentPieceDisplay(GamePiece piece) {
         currentPieceDisplay.displayPiece(piece);
     }
 
-    private void updateNextPieceDisplay(GamePiece piece) {
+    protected void updateNextPieceDisplay(GamePiece piece) {
         nextPieceDisplay.displayPiece(piece);
     }
 
@@ -378,7 +374,26 @@ public class ChallengeScene extends BaseScene{
            return -1;
         }
     }
+    public void failedToPlace(boolean failedToPlace) {
+        if (failedToPlace) {
+            multimedia.playAudio("src/main/resources/sounds/fail.wav");
+        } else {
+            multimedia.playAudio("src/main/resources/sounds/place.wav");
+        }
+    }
 
+    public void timerBar(double progress){
+        Platform.runLater(() -> {
+            GraphicsContext gc = timerBar.getGraphicsContext2D();
+            gc.clearRect(0,0,900,200);
+            Color fillColor = Color.rgb(250,(int)(250*progress),0);
+            gc.setFill(fillColor);
+            double fillAmount = progress*800;
+            gc.fillRect(0,0, fillAmount, 20);
+        });
+
+
+    }
 
 
 }

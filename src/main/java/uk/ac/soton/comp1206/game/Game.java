@@ -150,8 +150,7 @@ public class Game {
 
         //Create a new grid model to represent the game state
         this.grid = new Grid(cols, rows);
-        currentPiece.set(spawnPiece());
-        nextPiece.set(spawnPiece());
+
     }
 
     public void setFailToPlaceListener(FailToPlaceListener failToPlaceListener){
@@ -176,6 +175,8 @@ public class Game {
     public void start() {
         logger.info("Starting game");
         initialiseGame();
+        currentPiece.set(spawnPiece());
+        nextPiece.set(spawnPiece());
     }
 
 
@@ -216,6 +217,7 @@ public class Game {
             }
             startProgressUpdater();
             checkLives();
+
 
         });
     }
@@ -456,7 +458,7 @@ public class Game {
         int levelInt = (int)level;
         setLevel(levelInt);
         /**Handle the change level*/
-
+        getPieceMultiplayer();
     }
 
 
@@ -480,7 +482,7 @@ public class Game {
         this.nextPiece.set(temporaryPiece);
     }
 
-
-
+    /**This method purely exists to be overriden in the multiplayer version*/
+    public void getPieceMultiplayer(){}
 
 }

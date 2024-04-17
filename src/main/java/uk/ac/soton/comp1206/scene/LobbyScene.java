@@ -71,6 +71,9 @@ public class LobbyScene extends BaseScene{
 
     VBox chatMessages = new VBox();
 
+    Label lobbyDescription = new Label("Welcome to the Lobby \n Type /nick NewName to change your name \n \n");
+
+
 
     /**
      * Create a new scene, passing in the GameWindow the scene will be displayed in
@@ -167,8 +170,7 @@ public class LobbyScene extends BaseScene{
         lobbyName.setAlignment(Pos.CENTER);
         playerList.getStyleClass().add("playerList");
 
-        Label lobbyDescription = new Label("Welcome to the Lobby \n Type /nick NewName to change your name \n \n");
-        lobbyDescription.getStyleClass().add("chat");
+
 
         ScrollPane chatWindow = new ScrollPane();
         chatWindow.getStyleClass().add("chatWindow");
@@ -177,6 +179,7 @@ public class LobbyScene extends BaseScene{
         chatWindow.setContent(chatMessages);
         chatWindow.setPrefHeight(300);
 
+        lobbyDescription.getStyleClass().add("chat");
         chatMessages.getStyleClass().add("chatMessages");
         chatMessages.setFillWidth(true);
         chatMessages.getChildren().add(lobbyDescription);
@@ -288,6 +291,10 @@ public class LobbyScene extends BaseScene{
 
             }
         }
+        if(logs.startsWith("START")){
+            logger.info("Switching scenes");
+            loadMultiplayerGame();
+        }
         if(logs.startsWith("ERROR")){
             logger.info("ERROR OCCURED");
         }
@@ -298,8 +305,10 @@ public class LobbyScene extends BaseScene{
     private void joinLobby(String gameName){
         logger.info("Attempting to join "+gameName);
         if(!inLobby) {
+            chatMessages.getChildren().clear();
             chatView.setVisible(true);
             lobbyName.setText(gameName);
+            chatMessages.getChildren().add(lobbyDescription);
             communicator.send("JOIN " + gameName);
             inLobby = true;
             if(isHost){
@@ -344,7 +353,6 @@ public class LobbyScene extends BaseScene{
             communicator.send("CREATE " + gameName);
             isHost = true;
             joinLobby(gameName);
-
         }
     }
 
@@ -359,7 +367,18 @@ public class LobbyScene extends BaseScene{
         });
     }
 
-    private void startGame(){}
+    private void startGame(){
+        communicator.send("START");
+    }
+
+    private void loadMultiplayerGame(){
+        Platform.runLater(() -> {
+            stopLoop();
+            multimedia.stopMusic();
+            gameWindow.startMultiPlayerGame();
+        });
+
+    }
 
 
 

@@ -196,14 +196,10 @@ public class ScoresScene extends BaseScene {
 
     }
 
-    public void updateScores(SimpleListProperty<Pair<String, Integer>> newScores) {
-        this.localScores = newScores;
-    }
 
-    // Getters for external access
-    public SimpleListProperty<Pair<String, Integer>> getLocalScoresProperty() {
-        return localScores;
-    }
+
+
+
 
 
     public void handleKeyPress(KeyEvent keyEvent) {
