@@ -217,6 +217,7 @@ public class Game {
             }
             startProgressUpdater();
             checkLives();
+            getPieceMultiplayer();
 
 
         });
@@ -244,6 +245,7 @@ public class Game {
     private void checkLives(){
         if(getLivesValue()<0){
             setLives(0);
+            sendDieMessage(); //Purely for multiplayer
             stopLoop();
             logger.info("Lives below zero, loop stopped");
             //End game
@@ -482,7 +484,10 @@ public class Game {
         this.nextPiece.set(temporaryPiece);
     }
 
+
     /**This method purely exists to be overriden in the multiplayer version..*/
     public void getPieceMultiplayer(){}
+
+    public void sendDieMessage(){}
 
 }

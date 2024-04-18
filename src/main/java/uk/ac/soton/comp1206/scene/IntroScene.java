@@ -52,7 +52,7 @@ public class IntroScene extends BaseScene{
         introPane.getChildren().add(introWrapper);
 
         multimedia = new Multimedia();
-        //multimedia.playAudio("src/main/resources/sounds/intro.mp3");
+        multimedia.playAudio("src/main/resources/sounds/intro.mp3");
 
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), introWrapper);
         fadeIn.setFromValue(0);

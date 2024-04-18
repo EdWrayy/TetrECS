@@ -1,6 +1,8 @@
 package uk.ac.soton.comp1206.scene;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import uk.ac.soton.comp1206.game.Settings;
+import uk.ac.soton.comp1206.ui.GameWindow;
 
 import java.io.File;
 import java.net.URL;
@@ -11,12 +13,12 @@ public class Multimedia {
     private MediaPlayer audioPlayer;
     private MediaPlayer musicPlayer;
 
-
     /** playAudio Method
      * @param audioFilePath
      * Checks if audio is already playing and stops it if so
      * Plays specified audio file
      * */
+
 
 
     public void playAudio(String audioFilePath) {
@@ -26,7 +28,9 @@ public class Multimedia {
 
         Media audioFile = new Media(new File(audioFilePath).toURI().toString());
         audioPlayer = new MediaPlayer(audioFile);
-        audioPlayer.play();
+        if(Settings.soundActive) {
+            audioPlayer.play();
+        }
     }
 
 
@@ -39,11 +43,12 @@ public class Multimedia {
         if (musicPlayer != null) {
             musicPlayer.stop();
         }
-
         Media musicFile = new Media(new File(musicFilePath).toURI().toString());
         musicPlayer = new MediaPlayer(musicFile);
         musicPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Loops
-        //musicPlayer.play();
+        if(Settings.musicActive) {
+            musicPlayer.play();
+        }
     }
 
     public void stopMusic(){

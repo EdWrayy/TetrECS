@@ -289,8 +289,15 @@ public class ChallengeScene extends BaseScene{
             case TAB :
                game.gameLoop();
                break;
+            case T :
+                openChat();
+                break;
         }
     }
+
+
+
+    protected void openChat(){}
 
     private void currentAimMoveRight(){
         if(!(currentAimX >=4)){
@@ -334,6 +341,7 @@ public class ChallengeScene extends BaseScene{
     }
     private void endGame(KeyEvent keyEvent) {
         game.stopLoop();
+        multimedia.stopMusic();
         gameWindow.startMenu();
     }
 

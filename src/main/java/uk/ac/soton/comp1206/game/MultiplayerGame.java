@@ -3,6 +3,7 @@ package uk.ac.soton.comp1206.game;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uk.ac.soton.comp1206.event.DieMessageListener;
 import uk.ac.soton.comp1206.event.RequestPieceListener;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.scene.MultiplayerScene;
@@ -19,6 +20,8 @@ public class MultiplayerGame extends Game{
     public ArrayList<Pair<String, Integer>> playersData= new ArrayList<Pair<String,Integer>>();
 
     RequestPieceListener requestPieceListener;
+
+    DieMessageListener dieMessageListener;
 
     private static final Logger logger = LogManager.getLogger(MultiplayerGame.class);
 
@@ -38,10 +41,19 @@ public class MultiplayerGame extends Game{
         this.requestPieceListener = requestPieceListener;
     }
 
+    public void setDieMessageListener(DieMessageListener dieMessageListener){
+        this.dieMessageListener = dieMessageListener;
+    }
+
     @Override
     public void getPieceMultiplayer(){
         requestPieceListener.requestPiece();
         logger.info("Piece request sent to listener");
+    }
+
+    @Override
+    public void sendDieMessage(){
+        dieMessageListener.sendDieMessage();
     }
     public void enquePiece(int pieceValue){
         GamePiece newPiece = GamePiece.createPiece(pieceValue);
@@ -53,6 +65,9 @@ public class MultiplayerGame extends Game{
     public GamePiece spawnPiece(){
         return piecesQueue.remove();
     }
+
+
+
 
 
 

@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.ScoresList;
 import uk.ac.soton.comp1206.game.Game;
+import uk.ac.soton.comp1206.game.MultiplayerGame;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
@@ -179,8 +180,9 @@ public class ScoresScene extends BaseScene {
 
         loadScores("src/main/resources/IO/scores.txt");
         checkScore();
-        writeScores("src/main/resources/IO/scores.txt");
-
+        if(!(game instanceof MultiplayerGame)){
+            writeScores("src/main/resources/IO/scores.txt");
+        }
         communicator = gameWindow.getCommunicator();
         communicator.addListener(this::loadOnlineScores);
         communicator.send("HISCORES");
@@ -191,6 +193,11 @@ public class ScoresScene extends BaseScene {
 
 
         sortOnlineScores();
+
+        if(game instanceof MultiplayerGame){
+            localScoresLabel.setText("This Game");
+        }
+
 
 
 
@@ -241,13 +248,22 @@ public class ScoresScene extends BaseScene {
             localScores.add(new Pair<>("User", 4000));
             localScores.add(new Pair<>("User", 5000));
         }
-    if(localScores.isEmpty()){
-        localScores.add(new Pair<>("User", 1000));
-        localScores.add(new Pair<>("User", 2000));
-        localScores.add(new Pair<>("User", 3000));
-        localScores.add(new Pair<>("User", 4000));
-        localScores.add(new Pair<>("User", 5000));
-    }
+        if (localScores.isEmpty()) {
+            localScores.add(new Pair<>("User", 1000));
+            localScores.add(new Pair<>("User", 2000));
+            localScores.add(new Pair<>("User", 3000));
+            localScores.add(new Pair<>("User", 4000));
+            localScores.add(new Pair<>("User", 5000));
+        }
+        if (game instanceof MultiplayerGame) {
+            ArrayList<Pair<String, Integer>> arrayList = (((MultiplayerGame) game).playersData);
+            Iterator<Pair<String, Integer>> iterator = arrayList.iterator();
+            localScores.clear();
+            while (iterator.hasNext()) {
+                Pair<String, Integer> pair = iterator.next();
+                localScores.add(pair);
+            }
+        }
     }
 
     public void writeScores(String filePath) {
@@ -262,40 +278,44 @@ public class ScoresScene extends BaseScene {
     }
 
     public void checkScore(){
-        int score = game.getScoreValue();
-        Iterator<Pair<String,Integer>> scoresIterator = localScores.iterator();
-        int lowestHighScore = 999999999;
-        if(localScores.size() >= 10) {
-            while (scoresIterator.hasNext()) {
-                Pair<String, Integer> pair = scoresIterator.next();
-                Integer currentScore = pair.getValue();
-                if (currentScore < lowestHighScore) {
-                    lowestHighScore = currentScore;
+        if(game instanceof MultiplayerGame){}
+        else {
+            int score = game.getScoreValue();
+            Iterator<Pair<String, Integer>> scoresIterator = localScores.iterator();
+            int lowestHighScore = 999999999;
+            if (localScores.size() >= 10) {
+                while (scoresIterator.hasNext()) {
+                    Pair<String, Integer> pair = scoresIterator.next();
+                    Integer currentScore = pair.getValue();
+                    if (currentScore < lowestHighScore) {
+                        lowestHighScore = currentScore;
+                    }
                 }
-            }
-            if (score > lowestHighScore && score!=0) {
+                if (score > lowestHighScore && score != 0) {
+                    Optional<String> result = dialog.showAndWait();
+                    name = result.orElse("User");
+                    if (name.length() > 15) {
+                        name = name.substring(0, 15);
+                    }
+                    boolean valueRemoved = false;
+                    Iterator<Pair<String, Integer>> scoresIterator2 = localScores.iterator();
+                    while (scoresIterator2.hasNext() && !valueRemoved) {
+                        Pair<String, Integer> pair = scoresIterator2.next();
+                        if (pair.getValue() == lowestHighScore) {
+                            localScores.remove(pair);
+                            valueRemoved = true;
+                        }
+                    }
+                    localScores.add(new Pair<>(name, score));
+                }
+            } else if (score != 0) {
                 Optional<String> result = dialog.showAndWait();
                 name = result.orElse("User");
-                if(name.length()>15)
-                {name = name.substring(0,15);}
-                boolean valueRemoved = false;
-                Iterator<Pair<String,Integer>> scoresIterator2 = localScores.iterator();
-                while (scoresIterator2.hasNext() && !valueRemoved) {
-                    Pair<String, Integer> pair = scoresIterator2.next();
-                    if(pair.getValue() == lowestHighScore){
-                        localScores.remove(pair);
-                        valueRemoved = true;
-                    }
+                if (name.length() > 15) {
+                    name = name.substring(0, 15);
                 }
                 localScores.add(new Pair<>(name, score));
             }
-        }
-    else if(score!=0) {
-            Optional<String> result = dialog.showAndWait();
-            name = result.orElse("User");
-            if(name.length()>15)
-            {name = name.substring(0,15);}
-            localScores.add(new Pair<>(name, score));
         }
         sortScores();
     }

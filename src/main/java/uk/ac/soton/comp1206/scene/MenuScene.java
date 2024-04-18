@@ -101,6 +101,12 @@ public class MenuScene extends BaseScene {
         instructionsButton.setOnMouseEntered(e -> instructionsButton.getStyleClass().add("menuItem:hover"));
         instructionsButton.setOnMouseExited(e -> instructionsButton.getStyleClass().add("menuItem"));
 
+        var settingsButton = new Button("Settings");
+        settingsButton.setOnAction(this::settings);
+        settingsButton.getStyleClass().add("menuItem");
+        settingsButton.setOnMouseEntered(e -> settingsButton.getStyleClass().add("menuItem:hover"));
+        settingsButton.setOnMouseExited(e -> settingsButton.getStyleClass().add("menuItem"));
+
         var multiPlayerButton = new Button("Multi Player");
         multiPlayerButton.getStyleClass().add("menuItem");
         multiPlayerButton.setOnAction(this::startMultiPlayer);
@@ -114,10 +120,11 @@ public class MenuScene extends BaseScene {
         exitButton.setOnMouseExited(e -> exitButton.getStyleClass().add("menuItem"));
 
 
-        buttonLayout.getChildren().addAll(playButton, multiPlayerButton, instructionsButton, exitButton);
+        buttonLayout.getChildren().addAll(playButton, multiPlayerButton, instructionsButton, settingsButton, exitButton);
 
 
     }
+
 
 
 
@@ -163,5 +170,10 @@ public class MenuScene extends BaseScene {
 
     private void exit(ActionEvent event){
         System.exit(0);
+    }
+
+    public void settings(ActionEvent event){
+        multimedia.stopMusic();
+        gameWindow.startSettings();
     }
 }

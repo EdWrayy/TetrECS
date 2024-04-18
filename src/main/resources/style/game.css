@@ -183,6 +183,25 @@
       -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
       -fx-text-alignment: center;
       -fx-alignment: center;
+      -fx-strikethrough: true;
+}
+
+
+.headingDEAD {
+      -fx-text-fill: white;
+      -fx-font-family: 'Orbitron';
+      -fx-font-size: 26px;
+      -fx-font-weight: 900;
+      -fx-border-color: transparent;
+      -fx-stroke: black;
+      -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+
+}
+
+.headingDEAD .text {
+    -fx-strikethrough: true;
 }
 
 .pieceDisplays {
@@ -379,6 +398,12 @@ TextField {
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-color:transparent;
+    -fx-text-alignment: center;
+     -fx-alignment: center;
+}
+
+.inGameChatBox{
+
 }
 
 .list-view .scroll-bar {

@@ -34,10 +34,9 @@ public class MultiplayerScene extends ChallengeScene{
      * @param gameWindow the Game Window
      * */
     Label latestChat = new Label();
-    Label chatExplanation = new Label("In game chat. Press T to send a message");
+    Label chatExplanation = new Label("<In game chat. Press T to send a message>");
 
     VBox versusDisplay = new VBox();
-
 
     TextField messageBox = new TextField();
 
@@ -67,6 +66,7 @@ public class MultiplayerScene extends ChallengeScene{
         communicator.send("PIECE");
         communicator.send("PIECE");
         game.setRequestPieceListener(this::requestPiece);
+        game.setDieMessageListener(this::sendDieMessage);
         game.getPieceMultiplayer();
         game.getPieceMultiplayer();
         game.getPieceMultiplayer();
@@ -76,32 +76,38 @@ public class MultiplayerScene extends ChallengeScene{
 
 
 
-
-
         mainPane.setLeft(versusDisplay);
+        versusDisplay.setAlignment(Pos.CENTER_LEFT);
 
         VBox bottomScreen = new VBox();
         mainPane.setBottom(bottomScreen);
-        StackPane chat = new StackPane();
-        //bottomScreen.getChildren().add(chat);
+        bottomScreen.setAlignment(Pos.TOP_CENTER);
+        VBox chat = new VBox();
+        chat.setAlignment(Pos.TOP_CENTER);
+        bottomScreen.getChildren().add(chat);
         bottomScreen.getChildren().add(timerBar);
-        chatExplanation.getStyleClass().add("instructions");
+        chatExplanation.getStyleClass().add("chat");
+        messageBox.getStyleClass().add("inGameChatBox");
+        latestChat.getStyleClass().add("chat");
         chat.getChildren().add(chatExplanation);
         chat.getChildren().add(latestChat);
         chat.getChildren().add(messageBox);
 
-        messageBox = new TextField();
+
         messageBox.setVisible(false);
         chatExplanation.setVisible(true);
         latestChat.setVisible(true);
+        messageBox.requestFocus();
 
         messageBox.setPromptText("Send a message");
         messageBox.setOnAction((event -> {
             sendMessage(messageBox.getText());
+            event.consume();
         }));
 
         mainPane.getChildren().remove(labels);
         HBox newLabels = new HBox();
+        newLabels.setAlignment(Pos.TOP_CENTER);
         Label multiPlayerMatch = new Label("Multiplayer Match");
         multiPlayerMatch.setAlignment(Pos.CENTER);
         livesLabel.getStyleClass().add("heading");
@@ -162,29 +168,29 @@ public class MultiplayerScene extends ChallengeScene{
         logger.info("Initialised");
     }
 
-    @Override
-    public void handleKeyPress(KeyEvent keyEvent) {
-        if(Objects.requireNonNull(keyEvent.getCode()) == KeyCode.T){
-            openChat();
-        }
-        if(Objects.requireNonNull(keyEvent.getCode()) == KeyCode.ENTER){
-            if(chatOpen){
-                sendMessage(messageBox.getText());
-            }
-        }
-        else{
-            super.handleKeyPress(keyEvent);
-        }
 
-    }
-    private void openChat(){
+    @Override
+    protected void openChat(){
+        logger.info("Attempting to open chat");
         Platform.runLater(() -> {
             messageBox.setVisible(true);
+            messageBox.requestFocus();
             latestChat.setVisible(false);
             chatExplanation.setVisible(false);
             chatOpen = true;
         });
     }
+
+
+   @Override
+    public void gameOver(Game game){
+        stopLoop();
+        communicator.send("DIE");
+        multimedia.stopMusic();
+        gameWindow.startScores(game);
+        scene.setOnKeyPressed(null);
+    }
+
 
     private void requestPiece(){
         logger.info("piece request sent to server");
@@ -193,7 +199,7 @@ public class MultiplayerScene extends ChallengeScene{
 
     private void sendMessage(String message){
     logger.info("Sending message " + message);
-    communicator.send("MSG"+message);
+    communicator.send("MSG "+message);
         Platform.runLater(() -> {
             messageBox.clear();
             messageBox.setVisible(false);
@@ -201,6 +207,25 @@ public class MultiplayerScene extends ChallengeScene{
             chatOpen = false;
         });
     }
+
+    private void sendDieMessage(){
+        gameOver(game);
+    }
+
+    private void stopLoop() {
+        scheduler.shutdown(); // Shut down the scheduler
+        try {
+            if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow(); // Force shutdown if not terminated
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+        }
+        logger.info("Request loop has been stopped");
+    }
+
+
+
 
     private void handleNetworkLogs(String logs){
         if(logs.startsWith("MSG")){
@@ -233,8 +258,13 @@ public class MultiplayerScene extends ChallengeScene{
                 game.playersData.add(pair);
                     Platform.runLater(() -> {
                         Label label = new Label(playerName+"\n"+score);
-                        label.getStyleClass().add("heading");
+                        if(lives.equals("DEAD")){
+                            label.getStyleClass().add("headingDEAD");
+                            logger.info("DEAD HEADING ADDED");
+                        }
+                        else{label.getStyleClass().add("heading");}
                         versusDisplay.getChildren().add(label);
+                        label.setAlignment(Pos.CENTER);
                     });
 
                 }
