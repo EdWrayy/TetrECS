@@ -135,6 +135,7 @@ public class GameBoard extends GridPane{
      * Create a block at the given x and y position in the GameBoard
      * @param x column
      * @param y row
+     * @return GameBlock
      */
     protected GameBlock createBlock(int x, int y) {
         var blockWidth = width / cols;
@@ -192,6 +193,11 @@ public class GameBoard extends GridPane{
         blockClickedListener.blockClicked(block,event);
     }
 
+    /**
+     * Finds a block at a position and plays the fade out animation on it
+     * @param x coordinate of block
+     * @param y coordinate of block
+     */
     public void clearBlock(int x, int y){
         GameBlock gameBlock = getBlock(x,y);
         gameBlock.fadeOutAnimation();

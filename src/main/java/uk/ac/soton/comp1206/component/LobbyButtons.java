@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ A VBox containing buttons for the available servers in the lobby
+ Listens to the list of lobbies returned by the communicator in the lobby scene
+ */
 public class LobbyButtons extends VBox {
 
     private static final Logger logger = LogManager.getLogger(LobbyButtons.class);
@@ -24,6 +28,10 @@ public class LobbyButtons extends VBox {
 
     LobbyJoinListener lobbyJoinListener;
 
+    /**
+     Defines the size and width of the VBox and styling
+     Sets the list to call the update display method whenever it is changed
+     */
     public LobbyButtons() {
         //800x600
         setPrefHeight(300);
@@ -46,9 +54,19 @@ public class LobbyButtons extends VBox {
         });
     }
 
+    /**
+     Gets the list of lobbies
+     @return SimpleListProperty
+     */
     public SimpleListProperty<String> getLobbies(){
         return this.lobbies;
     }
+
+    /**
+     * Updates the display of lobbies
+     * Clears all current lobbies and adds the new ones from the list, styling them appropriately
+     * This is called on a loop from the lobbyScene
+     * */
 
     public void updateDisplay(){
         this.getChildren().clear();
@@ -65,9 +83,20 @@ public class LobbyButtons extends VBox {
         }
     }
 
+    /**
+     * Sets the listener
+     * @param lobbyJoinListener which will be a method reference in the lobbyScene class
+     * */
+
     public void setLobbyJoinListener(LobbyJoinListener lobbyJoinListener){
         this.lobbyJoinListener = lobbyJoinListener;
     }
+
+    /**
+     * @param gameName the name of the lobby
+     * Calls the lobbyjoin listener to join the lobby
+     */
+
     private void buttonClicked(ActionEvent event, String gameName){
         lobbyJoinListener.lobbyJoined(gameName);
     }

@@ -9,7 +9,9 @@ import uk.ac.soton.comp1206.ui.GameWindow;
  * A Base Scene used in the game. Handles common functionality between all scenes.
  */
 public abstract class BaseScene {
-
+    /**
+     * gameWindow which holds the scenes
+     */
     protected final GameWindow gameWindow;
 
     protected GamePane root;

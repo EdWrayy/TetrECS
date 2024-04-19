@@ -14,22 +14,37 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 
 import java.net.URL;
 
+/**
+ * Extension adding a loading screen
+ * Simply plays an animation of an image fading in and out then switches to the main menu
+ */
 public class IntroScene extends BaseScene{
+
+    Multimedia multimedia;
+
     /**
      * Create a new scene, passing in the GameWindow the scene will be displayed in
      *
      * @param gameWindow the game window
      */
-    Multimedia multimedia;
+
     public IntroScene(GameWindow gameWindow) {
         super(gameWindow);
     }
 
+    /**
+     * Initialise the root
+     */
     @Override
     public void initialise() {
         Scene scene = root.getScene();
     }
 
+    /**
+     * Set the background as black and add the loading screen image
+     * Play a fade in animation followed by a fade out
+     * Then switch to the main menu
+     */
     @Override
     public void build() {
         root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());

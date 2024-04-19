@@ -25,6 +25,10 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 
 import java.net.URL;
 
+/**
+ * A simple UI layout which describes how to play the game
+ * Not interactive at all
+ */
 
 
 public class InstructionsScene extends BaseScene{
@@ -43,6 +47,9 @@ public class InstructionsScene extends BaseScene{
     }
 
 
+    /**
+     * Sets handleKeyPress
+     */
     @Override
     public void initialise() {
         Scene scene = root.getScene();
@@ -51,7 +58,11 @@ public class InstructionsScene extends BaseScene{
         }
     }
 
-    /**Setup everything for the instruction scene*/
+    /**
+     * Setup everything for the instruction scene
+     * Mainly just Labels and images
+     * There is a dynamically generated array of pieceboards showing all the possible pieces
+     */
     @Override
     public void build() {
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
@@ -172,8 +183,10 @@ public class InstructionsScene extends BaseScene{
     }
 
 
-
-
+    /**
+     * If the user presses ESC we exit and load the menu screen
+     * @param keyEvent keyboard input
+     */
     public void handleKeyPress(KeyEvent keyEvent){
         switch(keyEvent.getCode()) {
             case ESCAPE:
@@ -182,6 +195,10 @@ public class InstructionsScene extends BaseScene{
         }
     }
 
+    /**
+     * Handles switching back to the menu scene
+     * @param event ESC key
+     */
     private void showMenu(KeyEvent event) {
         multimedia.stopMusic();
         gameWindow.startMenu();

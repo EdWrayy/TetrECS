@@ -38,6 +38,9 @@ public class ChallengeScene extends BaseScene{
 
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
+    /**
+     * The game instance
+     */
     protected Game game;
 
     Label scoreLabel = new Label();
@@ -85,6 +88,8 @@ public class ChallengeScene extends BaseScene{
 
     /**
      * Build the Challenge window
+     * Sets style and size of all visual components
+     * Binds labels to the lives, multiplier, score and level values in the game scene
      */
     @Override
     public void build() {
@@ -100,7 +105,6 @@ public class ChallengeScene extends BaseScene{
         challengePane.setMaxHeight(gameWindow.getHeight());
         challengePane.getStyleClass().add("challenge-background");
         root.getChildren().add(challengePane);
-
         mainPane = new BorderPane();
         challengePane.getChildren().add(mainPane);
         this.board = new GameBoard(game.getGrid(), gameWindow.getWidth() / 2, gameWindow.getWidth() / 2);
@@ -197,7 +201,8 @@ public class ChallengeScene extends BaseScene{
 
     /**
      * Handle when a block is clicked
-     *
+     *If left click, try to place
+     * If right click, rotate piece
      * @param gameBlock the Game Block that was clocked
      */
     private void blockClicked(GameBlock gameBlock, MouseEvent event) {
@@ -216,8 +221,6 @@ public class ChallengeScene extends BaseScene{
 
     /**
      * Setup the game object and model
-     * Make sure the score, level, multiplier and lives labels are binded to the actual data.
-     * Start playing the game music
      */
     public void setupGame() {
         logger.info("Starting a new challenge");
@@ -226,6 +229,10 @@ public class ChallengeScene extends BaseScene{
         game = new Game(5, 5);
     }
 
+    /**
+     * Called from the multiplayerScene to make sure that the game field variable is a multiplayer game
+     * @param game the multiplayer game setup in the multiplayerScene
+     */
     public void setupGame(MultiplayerGame game) {
         logger.info("Starting a new challenge");
 
@@ -235,6 +242,7 @@ public class ChallengeScene extends BaseScene{
 
     /**
      * Initialise the scene and start the game
+     * Set piece displays and currentAIM for keyboard
      */
     @Override
     public void initialise() {
@@ -250,6 +258,10 @@ public class ChallengeScene extends BaseScene{
 
     }
 
+    /**
+     * Handles what event should occur for each button pressed
+     * @param keyEvent the key/button clicked
+     */
     public void handleKeyPress(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
             case ESCAPE:
@@ -297,8 +309,14 @@ public class ChallengeScene extends BaseScene{
 
 
 
+    /**
+     * Overriden in the multiplayerScene which has a chat window
+     */
     protected void openChat(){}
 
+    /**
+     * Moves the current block selected one to the right
+     */
     private void currentAimMoveRight(){
         if(!(currentAimX >=4)){
             board.getBlock(currentAimX,currentAimY).paint();
@@ -306,6 +324,9 @@ public class ChallengeScene extends BaseScene{
             changeHover();
         }
     }
+    /**
+     * Moves the current block selected one to the left
+     */
     private void currentAimMoveLeft(){
         if(!(currentAimX <=0)){
             board.getBlock(currentAimX,currentAimY).paint();
@@ -313,6 +334,9 @@ public class ChallengeScene extends BaseScene{
             changeHover();
         }
     }
+    /**
+     * Moves the current block selected once up
+     */
     private void currentAimMoveUp(){
         if(!(currentAimY <=0)){
             board.getBlock(currentAimX,currentAimY).paint();
@@ -320,6 +344,9 @@ public class ChallengeScene extends BaseScene{
             changeHover();
         }
     }
+    /**
+     * Moves the current block selected once down
+     */
     private void currentAimMoveDown(){
         if(!(currentAimY >=4)){
             board.getBlock(currentAimX,currentAimY).paint();
@@ -328,17 +355,28 @@ public class ChallengeScene extends BaseScene{
         }
     }
 
+    /**
+     * Updates the hover animation showing the current aim
+     */
     private void changeHover(){
         GameBlock gameBlock = board.getBlock(currentAimX,currentAimY);
         gameBlock.setHovering();
     }
 
+    /**
+     * Cleans up and switches to the scores scene when the game is over
+     * @param game the game which just ended
+     */
     public void gameOver(Game game){
         multimedia.stopMusic();
+        scene.setOnKeyPressed(null);
         gameWindow.startScores(game);
         logger.info("Challenge Music Paused");
-        scene.setOnKeyPressed(null);
     }
+    /**
+     * Forcibly ends the game when ESC is pressed
+     * @param keyEvent is the ESC key
+     */
     private void endGame(KeyEvent keyEvent) {
         game.stopLoop();
         multimedia.stopMusic();
@@ -346,24 +384,45 @@ public class ChallengeScene extends BaseScene{
     }
 
 
+    /**
+     * Updates the current piece display
+     * @param piece current piece
+     */
     protected void updateCurrentPieceDisplay(GamePiece piece) {
         currentPieceDisplay.displayPiece(piece);
     }
 
+    /**
+     * Updates the next piece display
+     * @param piece next piece
+     */
     protected void updateNextPieceDisplay(GamePiece piece) {
         nextPieceDisplay.displayPiece(piece);
     }
 
 
 
+    /**
+     * Handles a block being cleared, especially the animation
+     * @param x coordinate of the block
+     * @param y coordinate of the block
+     */
     public void blockCleared(int x, int y) {
         board.clearBlock(x, y);
     }
 
+    /**
+     * Plays a life lost sound when called
+     */
     public void lifeLost(){
         multimedia.playAudio("src/main/resources/sounds/lifelose.wav");
     }
 
+    /**
+     * Tries to read the current highest score on the machine
+     * This is displayed on the UI
+     * @return int highScore
+     */
     private int getHighScore(){
         try {
             BufferedReader reader = Files.newBufferedReader(Paths.get("src/main/resources/IO/scores.txt"));
@@ -382,6 +441,11 @@ public class ChallengeScene extends BaseScene{
            return -1;
         }
     }
+
+    /**
+     * Plays the place audio or buzzer audio depending on whether or not the block could be placed
+     * @param failedToPlace T/F whether or not the block successfully placed after a click
+     */
     public void failedToPlace(boolean failedToPlace) {
         if (failedToPlace) {
             multimedia.playAudio("src/main/resources/sounds/fail.wav");
@@ -389,6 +453,12 @@ public class ChallengeScene extends BaseScene{
             multimedia.playAudio("src/main/resources/sounds/place.wav");
         }
     }
+
+    /**
+     * Draws the timer bar which changes length depending on how much time is left
+     * It is painted more red the closer it gets to 0
+     * @param progress the current progress of the timer
+     */
 
     public void timerBar(double progress){
         Platform.runLater(() -> {

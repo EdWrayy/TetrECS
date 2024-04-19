@@ -7,20 +7,19 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 import java.io.File;
 import java.net.URL;
 
-
+/**
+ * Handles playing music and sounds
+ */
 public class Multimedia {
 
     private MediaPlayer audioPlayer;
     private MediaPlayer musicPlayer;
 
-    /** playAudio Method
-     * @param audioFilePath
+    /**
      * Checks if audio is already playing and stops it if so
      * Plays specified audio file
-     * */
-
-
-
+     * @param audioFilePath filePath
+     */
     public void playAudio(String audioFilePath) {
         if (audioPlayer != null) {
             audioPlayer.stop();
@@ -34,11 +33,11 @@ public class Multimedia {
     }
 
 
-    /** playBackGroundMusic Method
-     * @param musicFilePath
+    /**
      * Checks if music is already playing and stops it if so
      * Plays specified music file on a continuous loop
-     * */
+     * @param musicFilePath filePath
+     */
     public void playBackgroundMusic(String musicFilePath) {
         if (musicPlayer != null) {
             musicPlayer.stop();
@@ -51,6 +50,9 @@ public class Multimedia {
         }
     }
 
+    /**
+     * Forcibly stop current music if any is playing
+     */
     public void stopMusic(){
         musicPlayer.stop();
     }

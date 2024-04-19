@@ -1,5 +1,6 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -10,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -33,6 +35,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * Displays the scores after a game ends
+ * In single player it displays the local scores and the online high scores
+ * In multiplayer it replaces the local scores with the scores of all players in that game
+ */
+
 public class ScoresScene extends BaseScene {
 
     Multimedia multimedia;
@@ -53,20 +61,33 @@ public class ScoresScene extends BaseScene {
     TextInputDialog dialog;
     private static final Logger logger = LogManager.getLogger(ScoresScene.class);
 
+    /**
+     * Saves data from the game
+     * @param gameWindow the current gameWindow
+     * @param game the game which just ended
+     */
     public ScoresScene(GameWindow gameWindow, Game game) {
         super(gameWindow);
         logger.info("Creating Challenge Scene");
         this.game = game;
     }
 
+    /**
+     * Sets up handling user input
+     */
     @Override
     public void initialise() {
-        Scene scene = root.getScene();
-        if (scene != null) {
-            scene.setOnKeyPressed(this::handleKeyPress);
-        }
+        scene.setOnKeyPressed(this::handleKeyPress);
     }
 
+    /**
+     * Sets up UI which contains a ScoresList custom component
+     * Loads the saved scores from the files
+     * Checks whether our scores beat any
+     * Add our score if necessary
+     * Sort the new list
+     * Override the old list with the new one, write it to the file
+     */
     @Override
     public void build() {
         multimedia = new Multimedia();
@@ -85,6 +106,10 @@ public class ScoresScene extends BaseScene {
 
         root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
         StackPane scoresPane = new StackPane();
+
+
+
+
         scoresPane.setMaxWidth(gameWindow.getWidth());
         scoresPane.setMaxHeight(gameWindow.getHeight());
         scoresPane.getStyleClass().add("menu-background");
@@ -200,34 +225,36 @@ public class ScoresScene extends BaseScene {
 
 
 
-
     }
 
 
-
-
-
-
+    /**
+     * If Escape is pressed we return to the main menu
+     * @param keyEvent event
+     */
 
     public void handleKeyPress(KeyEvent keyEvent) {
-        logger.info("key pressed");
-        switch(keyEvent.getCode()) {
-            case ESCAPE:
-                logger.info("ESC pressed");
-                showMenu(keyEvent);
-                break;
-            case P:
-                logger.info("P pressed");
-                showMenu(keyEvent);
-                break;
+        logger.info("Key Pressed: " + keyEvent);
+        if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.ESCAPE) {
+            showMenu(keyEvent);
         }
     }
+
+    /**
+     * Switch to main menu
+     * @param event ESCAPE
+     */
 
     private void showMenu(KeyEvent event) {
         multimedia.stopMusic();
         gameWindow.startMenu();
         logger.info("Instructions Music Stopped");
     }
+
+    /**
+     * Reads the saved scores files and loads them into the SimpleList as pairs of String names and integer scores
+     * @param filePath path of saved local scores
+     */
 
     public void loadScores(String filePath) {
         try {
@@ -266,6 +293,11 @@ public class ScoresScene extends BaseScene {
         }
     }
 
+    /**
+     * Writes updated list to the file to save any changes
+     * @param filePath path of local scores list
+     */
+
     public void writeScores(String filePath) {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePath))) {
             for (Pair<String, Integer> score : localScores.get()) {
@@ -277,6 +309,12 @@ public class ScoresScene extends BaseScene {
         }
     }
 
+    /**
+     * If there are more than 10 scores already, it checks if our scores beats any in the list
+     * If there are less than 10 scores our score is immediately added provided it isn't 0
+     * It will ask the user to input a username in single player, if nothing is entered it defaults to User
+     * In multiplayer their nickname is automatically used
+     */
     public void checkScore(){
         if(game instanceof MultiplayerGame){}
         else {
@@ -320,11 +358,18 @@ public class ScoresScene extends BaseScene {
         sortScores();
     }
 
+    /**
+     * Sorts the scores, putting the highest at index 0 and decending from there
+     */
     public void sortScores(){
         Comparator<Pair<String, Integer>> comparator = (pair1, pair2) -> pair2.getValue().compareTo(pair1.getValue());
         Collections.sort(localScores, comparator);
     }
 
+    /**
+     * Gets the scores from the server and creates a list of them
+     * @param onlineScore the scores received from the communicator
+     */
     public void loadOnlineScores(String onlineScore) {
         onlineScore = onlineScore.replaceFirst("HISCORES ", "");
         logger.info("online scores called on "+onlineScore);
@@ -339,6 +384,10 @@ public class ScoresScene extends BaseScene {
         }
     }
 
+    /**
+     * Checks if any of our scores beat the online scores
+     * If it does it will send our score to the server and update the list on our machine to contain our name
+     */
 
     public void checkOnlineScores(){
         int score = game.getScoreValue();
@@ -373,6 +422,9 @@ public class ScoresScene extends BaseScene {
     }
 
 
+    /**
+     * Sorts the online scores highest to lowest, used so that if our score beats an online score it will properly be sorted on our display.
+     */
     public void sortOnlineScores(){
         Comparator<Pair<String, Integer>> comparator = (pair1, pair2) -> pair2.getValue().compareTo(pair1.getValue());
         Collections.sort(remoteScores, comparator);

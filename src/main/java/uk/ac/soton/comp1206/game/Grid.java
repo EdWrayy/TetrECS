@@ -112,7 +112,14 @@ public class Grid {
     }
 
 
-    //Begin my code
+    /**
+     * Check if the squares around the block makeup are full or not to see if we can place the block
+     * Also check if any squares will be out of bounds
+     * @param gamePiece GamePiece
+     * @param xCoordinate coord
+     * @param yCoordinate coord
+     * @return T/F if we can play it or not
+     */
     public boolean canPlayPiece(GamePiece gamePiece, int xCoordinate, int yCoordinate) {
         logger.info("canPlayPiece was called with parameters " + gamePiece);
         boolean canPlayPiece = true;
@@ -129,14 +136,15 @@ public class Grid {
         logger.info("canPlayPiece returned the value " + canPlayPiece);
         return canPlayPiece;
     }
-    /** canPlayPiece Method
-     * @Param GamePiece
-     * @Param xCoordinate
-     * @Param yCoordinate
-     * @return boolean
-     *Here we are aligning the chosen x and y coordinate of the grid to the centre of the block
-     * If there is a value greater than 0 where the block has a value of 1 then it is already full and cannot be played
-     * If there is a value of -1 then it is out of bands and also cannot be played.
+
+    /**
+     * PlayPiece
+     * If we can play the piece, then change all the surrounding values to the value of that piece and call the afterpiece method
+     * @param gamePiece GamePiece we are placing
+     * @param xCoordinate coord
+     * @param yCoordinate coord
+     *
+     *
      */
 
     public void playPiece(GamePiece gamePiece, int xCoordinate, int yCoordinate) {

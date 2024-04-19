@@ -70,64 +70,135 @@ public class Game {
     private IntegerProperty multiplier = new SimpleIntegerProperty(this, "multiplier", 1);
 
 
+    /**
+     * Returns score property
+     * @return IntegerProperty
+     */
 
     public IntegerProperty getScoreProperty(){
         return score;
     }
-    /**Can return the object for binding*/
+
+    /**
+     * Returns scoreValue
+     * @return int score
+     */
     public int getScoreValue(){
         return score.get();
     }
-    /**Can return the value of the object*/
+
+    /**
+     * Sets score value
+     * @param score score we are setting
+     */
     public void setScore(int score) {
         this.score.set(score);
     }
-    /**Can set the value of the score*/
 
-    /**Now define the setters and getters for all other bindable properties*/
+
+    /**
+     * Returns level property
+     * @return integerProperty
+     */
     public IntegerProperty getLevelProperty(){
         return level;
     }
+
+    /**
+     * Returns level value
+     * @return int level
+     */
+
     public int getLevelValue(){
         return level.get();
     }
+
+    /**
+     * Sets level
+     * @param level level
+     */
     public void setLevel(int level) {
         this.level.set(level);
     }
+
+    /**
+     * Returns livesproperty
+     * @return lives
+     */
     public IntegerProperty getLivesProperty(){
         return lives;
     }
+
+    /**
+     * Returns lives value
+     * @return int lives
+     */
     public int getLivesValue(){
         return lives.get();
     }
+
+    /**
+     * Sets lives
+     * @param lives lives
+     */
     public void setLives(int lives) {
         this.lives.set(lives);
     }
+
+    /**
+     * Returns multiplier property
+     * @return integerProperty
+     */
     public IntegerProperty getMultiplierProperty(){
         return multiplier;
     }
+
+    /**
+     * Returns multiplier value
+     * @return int multiplier
+     */
     public int getMultiplierValue(){
         return multiplier.get();
     }
+
+    /**
+     * Sets multiplier
+     * @param multiplier value
+     */
     public void setMultiplier(int multiplier) {
         this.multiplier.set(multiplier);
     }
 
-
-
-
-
+    /**
+     * Returns current GamePiece
+     * @return GamePiece
+     */
     public GamePiece getCurrentPiece(){
         return currentPiece.get();
     }
+
+    /**
+     * Returns next GamePiece
+     * @return GamePiece
+     */
 
     public GamePiece getNextPiece(){
         return nextPiece.get();
     }
 
+    /**
+     * Returns currentPieceObjectProperty
+     * @return ObjectProperty
+     */
+
     public ObjectProperty<GamePiece> getCurrentPieceObjectProperty(){
         return currentPiece;
     }
+
+    /**
+     * Returns nextPieceObjectProperty
+     * @return ObjectProperty
+     */
     public ObjectProperty<GamePiece> getNextPieceObjectProperty(){
         return nextPiece;
     }
@@ -153,28 +224,54 @@ public class Game {
 
     }
 
+    /**
+     * Sets failed to place listener
+     * @param failToPlaceListener listener
+     */
     public void setFailToPlaceListener(FailToPlaceListener failToPlaceListener){
         this.failToPlaceListener = failToPlaceListener;
     }
 
+    /**
+     * Sets blockClearedListener
+     * @param blockClearedListener listener
+     */
     public void setBlockClearedListener(BlockClearedListener blockClearedListener){
         this.blockClearedListener = blockClearedListener;
     }
+
+    /**
+     * Sets gameLoopListener
+     * @param gameLoopListener listener
+     */
 
     public void setGameLoopListener(GameLoopListener gameLoopListener){
         this.gameLoopListener = gameLoopListener;
     }
 
+    /**
+     * Sets lifeLostListener
+     * @param lifeLostListener listener
+     */
     public void setLifeLostListener(LifeLostListener lifeLostListener){this.lifeLostListener = lifeLostListener;}
 
+    /**
+     * Sets gameOverListener
+     * @param gameOverListener listener
+     */
     public void setGameOverListener(GameOverListener gameOverListener){this.gameOverListener = gameOverListener;}
 
     /**
      * Start the game
+     * There is a small delay here for the purpose of multiplayer, as sometimes it can take some time to receive pieces from the server.
      */
     public void start() {
         logger.info("Starting game");
         initialiseGame();
+        try {
+            Thread.sleep(400);
+        }
+        catch(Exception ignored){}
         currentPiece.set(spawnPiece());
         nextPiece.set(spawnPiece());
     }
@@ -186,7 +283,7 @@ public class Game {
 
 
     /**
-     * Initialise a new game and set up anything that needs to be done at the start
+     * Sets up the game loop
      */
     public void initialiseGame() {
         logger.info("Initialising game");
@@ -204,7 +301,12 @@ public class Game {
     }
 
 
-
+    /**
+     * Called when time runs out or a piece is skipped.
+     * Loses 1 life, resets the multiplayer and replaces the current piece with a new one.
+     * Resets the loop again and calls the checkLives method as lives may now have run out
+     * Calls getPieceMultiplayer(), which will request a new piece for multiplayer games.
+     */
     public void gameLoop(){
         Platform.runLater(() -> {
             setLives(getLivesValue() - 1);
@@ -222,6 +324,11 @@ public class Game {
 
         });
     }
+
+    /**
+     * Regularly calculates the current progress of the gameloop and saves it as a double called progress.
+     * Progress will reduce overtime to a minimum of zero, at which point the updater stops until it is restarted by the gameloop method.
+     */
 
     private void startProgressUpdater() {
         final long startTime = System.currentTimeMillis();
@@ -242,6 +349,11 @@ public class Game {
 
 
 
+    /**
+     * Checks if the lives are now less than 0, if so it sets them back to zero just for visuals and ends the game
+     * This stops the game loop and sends a die message for multiplayer games
+     * The gameOverListener is also called to alert the challengeScene to switch to the scores scene
+     */
     private void checkLives(){
         if(getLivesValue()<0){
             setLives(0);
@@ -253,6 +365,9 @@ public class Game {
         }
     }
 
+    /**
+     * Forcibly stops the loop for when the game is ended
+     */
     public void stopLoop() {
         scheduler.shutdown(); // Shut down the scheduler
         try {
@@ -265,6 +380,10 @@ public class Game {
         logger.info("Game loop has been stopped");
     }
 
+    /**
+     * Resets the timer for the gameloop
+     */
+
     private void resetTimer(){
         gameLoopHandle.cancel(true);
         // Schedule a new game loop task with the updated delay
@@ -274,6 +393,12 @@ public class Game {
             startProgressUpdater();
         }
     }
+
+    /**
+     * Uses the specified formula to calculate how long the player should get to place each piece, based on their current level
+     * It cannot get any lower than 2500m
+     * @return int timer delay
+     */
 
     public int getTimerDelay(){
         int newTimerDelay = 12000-(500*getLevelValue());
@@ -361,8 +486,9 @@ public class Game {
         return GamePiece.createPiece(pieceNumber);
     }
 
-    /**nextPiece method
-     * @param newPiece
+    /**
+     * nextPiece method
+     * @param newPiece gamePiece
      */
 
     public void nextPiece(GamePiece newPiece) {
@@ -371,8 +497,18 @@ public class Game {
         this.nextPiece.set(newPiece);
     }
 
-    /**afterPiece method
-     *
+    /**
+     * Handles everything that can happen after a piece is played
+     * First find the full columns
+     * Loop through each element of the first row
+     * Loop through each column of the first row
+     * If any of the numbers in the column are empty, then the column is not full
+     * Save position of the top row of which the column is free
+     * Then do the same for the rows.
+     * Then clear all the full rows and columns if they are not already clear, and increment the number of lines and blocks cleared.
+     * Call the score method to find the increase in score
+     * Increase the multiplier if necessary
+     * Increase the level if necessary
      */
 
     public void afterPiece() {
@@ -384,11 +520,7 @@ public class Game {
 
 
         /**
-         * First find the full columns
-         * Loop through each element of the first row
-         * Loop through each column of the first row
-         * If any of the numbers in the column are empty, then the column is not full
-         * Save position of the top row of which the column is free
+         *
          * */
 
         ArrayList<Integer> fullColumns = new ArrayList<Integer>();
@@ -403,7 +535,7 @@ public class Game {
         }
 
 
-        /**Now we need to do the same for the full rows*/
+
         ArrayList<Integer> fullRows = new ArrayList<Integer>();
         for (int j = 0; j < numberOfRows; j++) {
             boolean rowIsFull = true;
@@ -415,7 +547,7 @@ public class Game {
             if(rowIsFull){fullRows.add(j);}
         }
 
-        /**Now clear the full columns if they are not already cleared and increment numberOfBlocksCleared and numberOfLinesCleared*/
+
         Iterator<Integer> columnIterator = fullColumns.iterator();
         while(columnIterator.hasNext()){
             numberOfLinesCleared++;
@@ -431,7 +563,7 @@ public class Game {
 
 
 
-        /**Now clear the full rows if they are not already cleared and increment numberOfBlocksCleared*/
+
         Iterator<Integer> rowIterator = fullRows.iterator();
         while(rowIterator.hasNext()){
             numberOfLinesCleared++;
@@ -446,7 +578,7 @@ public class Game {
         }
         logger.info("afterPiece method has cleared "+numberOfLinesCleared+" lines and "+numberOfBlocksCleared+ " blocks.");
         score(numberOfLinesCleared, numberOfBlocksCleared);
-        /**Handle the increase in score*/
+
 
         if(numberOfLinesCleared >0){
             setMultiplier(getMultiplierValue()+1);
@@ -454,30 +586,44 @@ public class Game {
         else{
             setMultiplier(1);
         }
-        /**Handle the increase of the multiplier*/
+
 
         double level = Math.floor((double) getScoreValue() /1000);
         int levelInt = (int)level;
         setLevel(levelInt);
-        /**Handle the change level*/
+
         getPieceMultiplayer();
     }
 
 
 
+    /**
+     * Uses an algorithm based off these variables and the multiplier to calculate the increase in score after a piece is played
+     * @param numberOfLines number of lines cleared
+     * @param numberOfBlocks number of blocks cleared
+     */
     public void score(int numberOfLines, int numberOfBlocks){
         int scoreToAdd = numberOfLines * numberOfBlocks * 10 * getMultiplierValue();
         setScore(getScoreValue()+scoreToAdd);
     }
 
+    /**
+     * Rotates a piece once to the right
+     */
     public void rotateCurrentPieceRight(){
         getCurrentPiece().rotate(1);
     }
 
+    /**
+     * Rotates a piece once to the left
+     */
     public void rotateCurrentPieceLeft(){
         getCurrentPiece().rotate(3);
     }
 
+    /**
+     * Swaps the current and next piece
+     */
     public void swapPieces(){
         this.temporaryPiece = getCurrentPiece();
         this.currentPiece.set(getNextPiece());
@@ -485,9 +631,16 @@ public class Game {
     }
 
 
-    /**This method purely exists to be overriden in the multiplayer version..*/
+    /**
+     * Overriden in the multiplayerGame
+     * Exists to request a new piece
+     */
     public void getPieceMultiplayer(){}
 
+    /**
+     * Overriden in the multiplayerGame
+     * Exists to send a die message to the server when the game ends
+     */
     public void sendDieMessage(){}
 
 }

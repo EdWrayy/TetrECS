@@ -138,6 +138,11 @@ public class MenuScene extends BaseScene {
         }
     }
 
+    /**
+     * Manage user input if necessary
+     * @param keyEvent input
+     */
+
     public void handleKeyPress(KeyEvent keyEvent){
         switch(keyEvent.getCode()) {
             case ESCAPE:
@@ -145,10 +150,10 @@ public class MenuScene extends BaseScene {
                 break;
         }
     }
+
     /**
      * Handle when the Start Game button is pressed
-     *
-     * @param event event
+     * @param event button click
      */
     private void startGame(ActionEvent event) {
         multimedia.stopMusic();
@@ -156,22 +161,38 @@ public class MenuScene extends BaseScene {
         logger.info("Menu Music Paused");
     }
 
+    /**
+     * Change to the instructions menu
+     * @param event button click
+     */
     private void showInstructions(ActionEvent event) {
         multimedia.stopMusic();
         gameWindow.startInstructions();
         logger.info("Menu Music Paused");
     }
 
+    /**
+     * Change to the lobby scene
+     * @param event button click
+     */
     private void startMultiPlayer(ActionEvent event){
         multimedia.stopMusic();
         gameWindow.startMultiPlayer();
         logger.info("Menu Music Paused");
     }
 
+    /**
+     * Terminate the programme
+     * @param event button click
+     */
     private void exit(ActionEvent event){
         System.exit(0);
     }
 
+    /**
+     * Change to the settings menu
+     * @param event buttonClick
+     */
     public void settings(ActionEvent event){
         multimedia.stopMusic();
         gameWindow.startSettings();

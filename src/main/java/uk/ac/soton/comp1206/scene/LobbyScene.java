@@ -37,6 +37,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Shows available lobbies, allows the user to join an available lobby or host a new one
+ * When in lobby shows chat and allows user to send chats and change nickname
+ * If the user is hosting they can start the multiplayer game
+ */
 public class LobbyScene extends BaseScene{
 
     private static final Logger logger = LogManager.getLogger(LobbyScene.class);
@@ -86,6 +91,9 @@ public class LobbyScene extends BaseScene{
         logger.info("Creating multiplayer scene");
     }
 
+    /**
+     * Intialise the loop which requests current lobbies
+     */
     @Override
     public void initialise() {
         final Runnable requestLoop = new Runnable()
@@ -102,6 +110,9 @@ public class LobbyScene extends BaseScene{
         }
     }
 
+    /**
+     * Layout the UI and add some functionality to the dialog host new game button
+     */
     @Override
     public void build() {
         root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
@@ -228,6 +239,10 @@ public class LobbyScene extends BaseScene{
         communicator.addListener(this::handleNetworkLogs);
     }
 
+    /**
+     * When the ESCAPE key is pressed return to the main menu and stop the loop
+     * @param keyEvent keyboard input
+     */
     private void handleKeyPress(KeyEvent keyEvent){
         switch(keyEvent.getCode()) {
             case ESCAPE:
@@ -237,6 +252,10 @@ public class LobbyScene extends BaseScene{
                 break;
         }
     }
+
+    /**
+     * Regularly request available lobbies and if currently in a lobby, request the current USERS
+     */
     private void requestLoop(){
         communicator.send("LIST");
         if(inLobby){
@@ -244,6 +263,15 @@ public class LobbyScene extends BaseScene{
         }
     }
 
+
+    /**
+     * When any communication is received from the communicator listener, this method is called
+     * @param logs the communication received
+     * If it is CHANNELS then we display the current available lobbies
+     * If it is USERS then we display the current available users
+     * If it is MSG then we add the received messsage to the chat window
+     * If it is START then we start the game
+     */
 
 
     private void handleNetworkLogs(String logs) {
@@ -301,7 +329,12 @@ public class LobbyScene extends BaseScene{
     }
 
 
-
+    /**
+     * Attempt to join a given lobby
+     * Figure out if we are the host
+     * Display the lobby window (chat, buttons)
+     * @param gameName name of lobby
+     */
     private void joinLobby(String gameName){
         logger.info("Attempting to join "+gameName);
         if(!inLobby) {
@@ -320,6 +353,9 @@ public class LobbyScene extends BaseScene{
         }
     }
 
+    /**
+     * Stop the communicator request loop
+     */
     private void stopLoop() {
         scheduler.shutdown(); // Shut down the scheduler
         try {
@@ -332,11 +368,19 @@ public class LobbyScene extends BaseScene{
         logger.info("Request loop has been stopped");
     }
 
+    /**
+     * Get the name of the lobby entered when trying to create a new one
+     * @param event enter button
+     */
     private void getInput(ActionEvent event){
         inputField.setVisible(true);
         inputField.requestFocus();
     }
 
+    /**
+     * Send a new message to the communicator including the users nickname
+     * @param message message entered
+     */
     private void sendMessage(String message){
         if(message.startsWith("/nick")){
             nickName = message.replace("/nick ", "").trim();
@@ -347,6 +391,10 @@ public class LobbyScene extends BaseScene{
         }
     }
 
+    /**
+     * Request to create and then join a new lobby as the host
+     * @param gameName lobby name
+     */
     private void hostGame(String gameName){
         if(!inLobby) {
             logger.info("Hosting " + gameName);
@@ -355,6 +403,10 @@ public class LobbyScene extends BaseScene{
             joinLobby(gameName);
         }
     }
+
+    /**
+     * Leave a lobby if we are currently in one
+     */
 
     private void leaveLobby(){
         chatView.setVisible(false);
@@ -367,10 +419,16 @@ public class LobbyScene extends BaseScene{
         });
     }
 
+    /**
+     * Start a game if we are host
+     */
     private void startGame(){
         communicator.send("START");
     }
 
+    /**
+     * Change the window to the multiplayer game
+     */
     private void loadMultiplayerGame(){
         Platform.runLater(() -> {
             stopLoop();

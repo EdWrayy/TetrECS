@@ -27,6 +27,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The extension to the challenge scene, UI for the multiplayer mode
+ * Has a simpler UI with less information, but shows the states and scores of all players in the lobby
+ */
+
 public class MultiplayerScene extends ChallengeScene{
     /**
      * Create a new Single Player challenge scene
@@ -53,24 +58,38 @@ public class MultiplayerScene extends ChallengeScene{
 
     private static final Logger logger = LogManager.getLogger(MultiplayerScene.class);
 
+    /**
+     * Constructs super class
+     * Requests a few pieces immediately to populate the queue in multiplayer game, as this cannot be empty when the game is initialized.
+     * @param gameWindow the gameWindow
+     */
     public MultiplayerScene(GameWindow gameWindow) {
         super(gameWindow);
+        communicator.send("PIECE");
+        communicator.send("PIECE");
+        communicator.send("PIECE");
         logger.info("multiPlayerScene created");
     }
 
 
-
+    /**
+     * Create and start a new game
+     * Request a few more pieces so there is a buffer in the queue
+     * This means if we place many pieces very quickly, we will not empty the queue before new ones are added
+     * Setup the UI, removing some things from the previous one and adding the new players list lable
+     * Add the chat window
+     */
     @Override
     public void build(){
+        communicator.send("PIECE");
+        communicator.send("PIECE");
+        communicator.send("PIECE");
+        communicator.send("PIECE");
+        communicator.send("PIECE");
+        communicator.send("PIECE");
         this.game = new MultiplayerGame(5,5);
-        communicator.send("PIECE");
-        communicator.send("PIECE");
         game.setRequestPieceListener(this::requestPiece);
         game.setDieMessageListener(this::sendDieMessage);
-        game.getPieceMultiplayer();
-        game.getPieceMultiplayer();
-        game.getPieceMultiplayer();
-        game.getPieceMultiplayer();
         super.setupGame(game);
         super.build();
 
@@ -128,7 +147,11 @@ public class MultiplayerScene extends ChallengeScene{
     }
 
 
-
+    /**
+     * Regularly called
+     * Requests the current players with their scores and lives
+     * Updates the current board status, our lives and score
+     */
     private void requestLoop(){
 
         //All updates TO the server
@@ -137,12 +160,16 @@ public class MultiplayerScene extends ChallengeScene{
                                   +game.getGrid().get(1,0) + " "+game.getGrid().get(1,1) + " "+game.getGrid().get(1,1) + " "
                                   +game.getGrid().get(2,2) + " "+game.getGrid().get(2,2) + " "+game.getGrid().get(2,2) + " ");
         communicator.send("LIVES "+game.getLivesValue());
-        communicator.send("SCORE "+game.getScoreValue());
+
 
         //All updates FROM the server
         communicator.send("SCORES");
     }
 
+    /**
+     * Starts the game and sets our current aim to 0,0 for keyboard use
+     * Starts the request loop
+     */
     @Override
     public void initialise(){
         if (scene != null) {
@@ -151,10 +178,12 @@ public class MultiplayerScene extends ChallengeScene{
 
         game.start();
 
-        super.updateCurrentPieceDisplay(game.getCurrentPiece());
-        super.updateNextPieceDisplay(game.getNextPiece());
+
+
+
         currentAimX = 0;
         currentAimY = 0;
+
 
         final Runnable requestLoop = new Runnable()
         {
@@ -163,12 +192,31 @@ public class MultiplayerScene extends ChallengeScene{
                 logger.info("requestLoop has been called");
             }
         };
-        requestLoopHandle = scheduler.scheduleAtFixedRate(requestLoop, 1000, 1000, TimeUnit.MILLISECONDS);
+        requestLoopHandle = scheduler.scheduleAtFixedRate(requestLoop, 0, 400, TimeUnit.MILLISECONDS);
 
         logger.info("Initialised");
     }
 
+    /**
+     * @param event the key/button clicked
+     * Handles what event should occur for each button pressed
+     */
+    @Override
+    public void handleKeyPress(KeyEvent event) {
+        if (Objects.requireNonNull(event.getCode()) == KeyCode.ESCAPE) {
+            stopLoop();
+            communicator.send("DIE");
+            multimedia.stopMusic();
+            gameWindow.startMenu();
+        }
+        else{
+            super.handleKeyPress(event);
+        }
+    }
 
+    /**
+     * Opens the chat allowing us to type and send a message
+     */
     @Override
     protected void openChat(){
         logger.info("Attempting to open chat");
@@ -182,7 +230,11 @@ public class MultiplayerScene extends ChallengeScene{
     }
 
 
-   @Override
+    /**
+     * When the game ends it sends a DIE message to the server and loads the scoresScene
+     * @param game the current game for scores
+     */
+    @Override
     public void gameOver(Game game){
         stopLoop();
         communicator.send("DIE");
@@ -191,12 +243,18 @@ public class MultiplayerScene extends ChallengeScene{
         scene.setOnKeyPressed(null);
     }
 
-
+    /**
+     * Requests a new piece from the server
+     */
     private void requestPiece(){
         logger.info("piece request sent to server");
         communicator.send("PIECE");
     }
 
+    /**
+     * Sends a new message to the server and updates chat
+     * @param message message sent
+     */
     private void sendMessage(String message){
     logger.info("Sending message " + message);
     communicator.send("MSG "+message);
@@ -208,10 +266,17 @@ public class MultiplayerScene extends ChallengeScene{
         });
     }
 
+    /**
+     * Called from the multiplayerGame class when lives run out
+     * Calls the game over method
+     */
     private void sendDieMessage(){
         gameOver(game);
     }
 
+    /**
+     * Forcibly stops the request loop
+     */
     private void stopLoop() {
         scheduler.shutdown(); // Shut down the scheduler
         try {
@@ -225,8 +290,13 @@ public class MultiplayerScene extends ChallengeScene{
     }
 
 
-
-
+    /**
+     * Handles all possible messages received from the communicator
+     * @param logs received from the communicator
+     * If MSG, update chat with the received message
+     * If SCORES, update the displayed players scores
+     * If PIECE, enque the received piece number to the queue in the multiplayer Game class
+     */
     private void handleNetworkLogs(String logs){
         if(logs.startsWith("MSG")){
             logger.info("Received Messages: " + logs);

@@ -18,6 +18,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * The scene which displays the toggle buttons for the game settings and allows users to change them
+ */
+
 public class SettingsScene extends BaseScene{
 
 
@@ -33,14 +37,26 @@ public class SettingsScene extends BaseScene{
     private Button musicButton;
     private Button soundButton;
 
+    /**
+     * Setup the scene
+     * @param gameWindow the gameWindow
+     */
     public SettingsScene(GameWindow gameWindow) {
         super(gameWindow);
     }
 
+    /**
+     * Setup keypress handling
+     */
     @Override
     public void initialise() {
         scene.setOnKeyPressed(this::handleKeyPress);
     }
+
+    /**
+     * Design all the UI
+     * The toggle buttons show if they are currently toggled ON/OFF
+     */
 
     @Override
     public void build() {
@@ -91,6 +107,14 @@ public class SettingsScene extends BaseScene{
 
     }
 
+    /**
+     * If musicActive is false set it to true and vice versa
+     * Will also stop/start playing music immediately
+     * Write the new condition to the file to save it
+     * Change the appearance of the toggle button
+     * @param event mouseclick on button
+     */
+
 
     private void toggleMusic(ActionEvent event){
         if(Settings.musicActive) {
@@ -123,6 +147,12 @@ public class SettingsScene extends BaseScene{
         }
     }
 
+    /**
+     * If soundActive is false set it to true and vice versa
+     * Write the new condition to the file to save it
+     * Change the appearance of the toggle button
+     * @param event mouseclick on button
+     */
     private void toggleSound(ActionEvent event){
         if(Settings.soundActive) {
             Settings.soundActive = false;
@@ -149,6 +179,10 @@ public class SettingsScene extends BaseScene{
     }
 
 
+    /**
+     * If ESC is pressed go back to the main menu
+     * @param keyEvent user input
+     */
     public void handleKeyPress(KeyEvent keyEvent) {
         logger.info("key pressed");
         switch(keyEvent.getCode()) {

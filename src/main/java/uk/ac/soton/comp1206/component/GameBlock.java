@@ -109,7 +109,9 @@ public class GameBlock extends Canvas {
         paint();
     }
 
-
+    /**
+     * Set a hovering animation when a block is highlighted, reducing opacity.
+     */
     public void setHovering(){
         Color color = COLOURS[getValue()];
         double red = color.getRed();
@@ -145,9 +147,9 @@ public class GameBlock extends Canvas {
     }
 
 
-
-
-
+    /**
+     * Plays a fade out animation on a block
+     */
     public void fadeOutAnimation(){
         GraphicsContext gc = getGraphicsContext2D();
         gc.setFill(new Color(1, 1, 1, 1));
@@ -267,6 +269,9 @@ public class GameBlock extends Canvas {
     }
 
 
+    /**
+     * Draws a ring on a block
+     */
     public void addCenterRing(){
         var gc = getGraphicsContext2D();
         double diameter = Math.min(width, height) * 0.6;

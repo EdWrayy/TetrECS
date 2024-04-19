@@ -12,6 +12,7 @@ public interface BlockClickedListener {
     /**
      * Handle a block clicked event
      * @param block the block that was clicked
+     * @param event the type of click which occoured
      */
     public void blockClicked(GameBlock block, MouseEvent event);
 

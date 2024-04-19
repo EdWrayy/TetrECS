@@ -8,6 +8,10 @@ import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.game.Grid;
 import uk.ac.soton.comp1206.scene.MenuScene;
 
+/**
+ A smaller version of the PieceBoard for the instructions scene.
+ Works the exact same as PieceBoard just with a smaller width and height.
+ */
 public class InstructionsPieceBoard extends GameBoard {
 
     Grid grid;
@@ -15,6 +19,13 @@ public class InstructionsPieceBoard extends GameBoard {
     int rows;
     double width;
     double height;
+
+    /**
+     Sets the numbers of rows and columns to 3
+     Sets the width and height to 50
+     Creates a new grid for the field variable
+     Builds the gameboard
+     */
     public InstructionsPieceBoard() {
         super(3,3,50,50);
         cols = 3;
@@ -25,13 +36,15 @@ public class InstructionsPieceBoard extends GameBoard {
         build();
     }
 
-    /**displayPiece method
-     * @Param GamePiece
-     * @Return PieceBoard
+
+    private static final Logger logger = LogManager.getLogger(InstructionsPieceBoard.class);
+
+    /**
      * Takes a game piece, and first clears the board, then iterates through the blocks, binding the new value of the gamepiece to the blocks in the pieceboard where necessary
      * Returns this pieceboard once that is done
+     * @param gamePiece the piece we are displaying
+     * @return InstructionsPieceBoard the finished display
      */
-    private static final Logger logger = LogManager.getLogger(InstructionsPieceBoard.class);
     public InstructionsPieceBoard displayPiece(GamePiece gamePiece){
         int[][] blocks = gamePiece.getBlocks();
         SimpleIntegerProperty valueProperty = new SimpleIntegerProperty(gamePiece.getValue());

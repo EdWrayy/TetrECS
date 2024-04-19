@@ -84,7 +84,14 @@ public class GameWindow {
      * Display the main menu
      */
 
+    /**
+     * Display intro scene
+     */
     public void startIntroScene(){loadScene(new IntroScene(this));}
+
+    /**
+     * Display menu scene
+     */
     public void startMenu() {loadScene(new MenuScene(this));}
 
     /**
@@ -92,13 +99,30 @@ public class GameWindow {
      */
     public void startChallenge() {loadScene(new ChallengeScene(this)); }
 
+    /**
+     * Display instructions
+     */
     public void startInstructions() { loadScene(new InstructionsScene(this)); }
 
+    /**
+     * Display scores
+     * @param game game which just ended
+     */
     public void startScores(Game game) { loadScene(new ScoresScene(this, game)); }
 
+    /**
+     * Display lobby
+     */
     public void startMultiPlayer(){loadScene(new LobbyScene(this));}
 
+    /**
+     * Display multiplayerGame
+     */
     public void startMultiPlayerGame(){loadScene(new MultiplayerScene(this));}
+
+    /**
+     * Display settings
+     */
 
     public void startSettings(){loadScene(new SettingsScene(this));}
 
