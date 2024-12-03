@@ -11,3 +11,7 @@ A Tetris-like game created as part of university coursework using **JavaFX**.
 3. Enter the following command:
    ```bash
    mvn clean compile javafx:run
+
+## Video Demo
+
+Watch the video demo of TetrECS [here](https://drive.google.com/file/d/1oKtrOL0VYi6lk2QlF5Zg8E1Lgr9WAqYv/view?usp=sharing).
